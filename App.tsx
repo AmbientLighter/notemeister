@@ -136,7 +136,7 @@ const App: React.FC = () => {
       // Auto advance
       setTimeout(() => {
         nextTurn();
-      }, 800);
+      }, 300);
     } else {
       setFeedback({ type: 'incorrect', message: `${t.incorrectAnswer} ${currentNote.name}` });
       setLastIncorrectNote(selectedName);
@@ -144,7 +144,7 @@ const App: React.FC = () => {
       // Auto advance slower on error to let them see
       setTimeout(() => {
         nextTurn();
-      }, 2000);
+      }, 1200);
     }
   };
 

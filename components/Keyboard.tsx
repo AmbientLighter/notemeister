@@ -16,7 +16,7 @@ const Keyboard: React.FC<KeyboardProps> = ({
   lastIncorrectNote 
 }) => {
   return (
-    <div className="grid grid-cols-7 gap-2 md:gap-4 w-full max-w-2xl mx-auto p-4">
+    <div className="flex flex-wrap md:grid md:grid-cols-7 gap-3 md:gap-4 w-full max-w-3xl mx-auto p-4 justify-center">
       {NOTE_NAMES.map((note) => {
         let btnClass = "bg-white text-slate-800 border-b-4 border-slate-300 hover:bg-slate-50 hover:border-slate-400 active:border-b-0 active:translate-y-1";
         
@@ -36,8 +36,13 @@ const Keyboard: React.FC<KeyboardProps> = ({
             onClick={() => !disabled && onNoteSelect(note)}
             disabled={disabled}
             className={`
-              h-16 md:h-24 rounded-lg font-bold text-xl md:text-2xl transition-all duration-100 select-none
-              flex items-center justify-center shadow-sm
+              h-20 md:h-24 
+              w-[22%] md:w-auto flex-grow md:flex-grow-0
+              rounded-xl md:rounded-2xl
+              font-bold text-2xl md:text-3xl 
+              transition-all duration-100 select-none
+              flex items-center justify-center shadow-md
+              active:scale-95
               ${btnClass}
             `}
           >
