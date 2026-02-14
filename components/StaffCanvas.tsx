@@ -5,10 +5,11 @@ import { getNoteVisualPosition } from '../utils/musicLogic';
 interface StaffCanvasProps {
   clef: ClefType;
   note: Note | null;
+  darkMode?: boolean;
   className?: string;
 }
 
-const StaffCanvas: React.FC<StaffCanvasProps> = ({ clef, note, className }) => {
+const StaffCanvas: React.FC<StaffCanvasProps> = ({ clef, note, darkMode = false, className }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -32,6 +33,10 @@ const StaffCanvas: React.FC<StaffCanvasProps> = ({ clef, note, className }) => {
     const width = rect.width;
     const height = rect.height;
 
+    // --- Colors ---
+    const lineColor = darkMode ? '#94a3b8' : '#1e293b'; // slate-400 : slate-800
+    const noteColor = darkMode ? '#f8fafc' : '#0f172a'; // slate-50 : slate-900
+
     // --- Drawing Logic ---
     
     // Clear
@@ -46,7 +51,7 @@ const StaffCanvas: React.FC<StaffCanvasProps> = ({ clef, note, className }) => {
     
     // Draw Staff Lines
     ctx.lineWidth = 2;
-    ctx.strokeStyle = '#1e293b'; // slate-800
+    ctx.strokeStyle = lineColor;
     ctx.lineCap = 'round';
 
     for (let i = 0; i < 5; i++) {
@@ -69,7 +74,7 @@ const StaffCanvas: React.FC<StaffCanvasProps> = ({ clef, note, className }) => {
     ctx.stroke();
 
     // Draw Clef
-    ctx.fillStyle = '#0f172a'; // slate-900
+    ctx.fillStyle = noteColor;
     const fontSize = staffHeight * 1.5;
     ctx.font = `${fontSize}px serif`;
     ctx.textAlign = 'center';
@@ -153,12 +158,12 @@ const StaffCanvas: React.FC<StaffCanvasProps> = ({ clef, note, className }) => {
       }
     }
 
-  }, [clef, note]);
+  }, [clef, note, darkMode]);
 
   return (
     <canvas 
       ref={canvasRef} 
-      className={`w-full h-full bg-white rounded-xl shadow-inner border border-slate-200 ${className}`}
+      className={`w-full h-full bg-white dark:bg-slate-800 rounded-xl shadow-inner border border-slate-200 dark:border-slate-700 transition-colors duration-200 ${className}`}
     />
   );
 };

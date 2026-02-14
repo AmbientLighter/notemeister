@@ -11,6 +11,7 @@ type SortMethod = 'difficulty' | 'name' | 'time';
 const App: React.FC = () => {
   // --- State ---
   const [screen, setScreen] = useState<Screen>('setup');
+  const [darkMode, setDarkMode] = useState(false);
   
   // Settings
   const [settings, setSettings] = useState<GameSettings>({
@@ -68,6 +69,10 @@ const App: React.FC = () => {
   }, [stats.history, sortMethod]);
 
   // --- Handlers ---
+
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
 
   const handleLanguageChange = (lang: Language) => {
     setSettings(prev => ({ ...prev, language: lang }));
@@ -155,14 +160,16 @@ const App: React.FC = () => {
   // --- Render Helpers ---
 
   const renderSetup = () => (
-    <div className="bg-white p-6 md:p-10 rounded-3xl shadow-xl max-w-lg w-full animate-fade-in">
+    <div className="bg-white dark:bg-slate-800 p-6 md:p-10 rounded-3xl shadow-xl max-w-lg w-full animate-fade-in transition-colors duration-200">
       <div className="flex justify-center gap-2 mb-8">
         {(['en', 'ru', 'uk', 'et'] as Language[]).map(lang => (
           <button
             key={lang}
             onClick={() => handleLanguageChange(lang)}
             className={`px-3 py-1 rounded-full text-sm font-semibold transition-colors ${
-              settings.language === lang ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              settings.language === lang 
+                ? 'bg-indigo-600 text-white' 
+                : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
             }`}
           >
             {lang.toUpperCase()}
@@ -170,19 +177,19 @@ const App: React.FC = () => {
         ))}
       </div>
 
-      <h1 className="text-3xl font-bold text-center text-slate-800 mb-2">{t.title}</h1>
-      <p className="text-center text-slate-500 mb-8">{t.subtitle}</p>
+      <h1 className="text-3xl font-bold text-center text-slate-800 dark:text-white mb-2">{t.title}</h1>
+      <p className="text-center text-slate-500 dark:text-slate-400 mb-8">{t.subtitle}</p>
 
       {/* Clef Selection */}
       <div className="mb-8">
-        <label className="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wide">{t.selectClef}</label>
+        <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-wide">{t.selectClef}</label>
         <div className="grid grid-cols-2 gap-4">
           <button
             onClick={() => handleClefChange('treble')}
             className={`p-4 rounded-xl border-2 flex flex-col items-center gap-2 transition-all ${
               settings.clef === 'treble' 
-                ? 'border-indigo-600 bg-indigo-50 text-indigo-700' 
-                : 'border-slate-200 hover:border-indigo-200 text-slate-600'
+                ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400' 
+                : 'border-slate-200 dark:border-slate-700 hover:border-indigo-200 dark:hover:border-indigo-700 text-slate-600 dark:text-slate-400'
             }`}
           >
             <span className="text-4xl">𝄞</span>
@@ -192,8 +199,8 @@ const App: React.FC = () => {
             onClick={() => handleClefChange('bass')}
             className={`p-4 rounded-xl border-2 flex flex-col items-center gap-2 transition-all ${
               settings.clef === 'bass' 
-                ? 'border-indigo-600 bg-indigo-50 text-indigo-700' 
-                : 'border-slate-200 hover:border-indigo-200 text-slate-600'
+                ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400' 
+                : 'border-slate-200 dark:border-slate-700 hover:border-indigo-200 dark:hover:border-indigo-700 text-slate-600 dark:text-slate-400'
             }`}
           >
             <span className="text-4xl">𝄢</span>
@@ -204,7 +211,7 @@ const App: React.FC = () => {
 
       {/* Octave Selection */}
       <div className="mb-8">
-        <label className="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wide">{t.selectOctaves}</label>
+        <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-wide">{t.selectOctaves}</label>
         <div className="flex flex-wrap gap-3 justify-center">
           {OCTAVE_RANGES[settings.clef].map(octave => (
             <button
@@ -212,8 +219,8 @@ const App: React.FC = () => {
               onClick={() => toggleOctave(octave)}
               className={`w-12 h-12 rounded-lg font-bold text-lg flex items-center justify-center transition-all ${
                 settings.selectedOctaves.includes(octave)
-                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200 scale-105'
-                  : 'bg-white border-2 border-slate-200 text-slate-400 hover:border-slate-300'
+                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200 dark:shadow-none scale-105'
+                  : 'bg-white dark:bg-slate-700 border-2 border-slate-200 dark:border-slate-600 text-slate-400 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-500'
               }`}
             >
               {octave}
@@ -228,7 +235,7 @@ const App: React.FC = () => {
       <button
         onClick={startGame}
         disabled={settings.selectedOctaves.length === 0}
-        className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold rounded-xl text-lg shadow-lg shadow-indigo-200 transition-transform active:scale-95"
+        className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-bold rounded-xl text-lg shadow-lg shadow-indigo-200 dark:shadow-none transition-transform active:scale-95"
       >
         {t.startSession}
       </button>
@@ -238,23 +245,23 @@ const App: React.FC = () => {
   const renderGame = () => (
     <div className="flex flex-col h-full w-full max-w-4xl mx-auto items-center">
       {/* Header Stats */}
-      <div className="w-full grid grid-cols-3 md:grid-cols-4 gap-4 p-4 md:p-6 bg-white rounded-b-3xl shadow-sm mb-6">
+      <div className="w-full grid grid-cols-3 md:grid-cols-4 gap-4 p-4 md:p-6 bg-white dark:bg-slate-800 rounded-b-3xl shadow-sm mb-6 transition-colors duration-200">
         <div className="text-center">
-          <div className="text-2xl font-bold text-indigo-600">{stats.correct}</div>
-          <div className="text-xs text-slate-500 uppercase font-semibold">{t.correct}</div>
+          <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{stats.correct}</div>
+          <div className="text-xs text-slate-500 dark:text-slate-400 uppercase font-semibold">{t.correct}</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-slate-700">{Math.round((stats.correct / (stats.total || 1)) * 100)}%</div>
-          <div className="text-xs text-slate-500 uppercase font-semibold">{t.accuracy}</div>
+          <div className="text-2xl font-bold text-slate-700 dark:text-slate-200">{Math.round((stats.correct / (stats.total || 1)) * 100)}%</div>
+          <div className="text-xs text-slate-500 dark:text-slate-400 uppercase font-semibold">{t.accuracy}</div>
         </div>
         <div className="text-center">
           <div className="text-2xl font-bold text-orange-500">{stats.streak}</div>
-          <div className="text-xs text-slate-500 uppercase font-semibold">{t.streak}</div>
+          <div className="text-xs text-slate-500 dark:text-slate-400 uppercase font-semibold">{t.streak}</div>
         </div>
         <div className="hidden md:block text-center">
             <button 
                 onClick={finishGame}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-sm font-semibold transition-colors"
+                className="px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 rounded-lg text-sm font-semibold transition-colors"
             >
                 {t.finishSession}
             </button>
@@ -267,7 +274,11 @@ const App: React.FC = () => {
         {/* Feedback Bubble */}
         <div className={`h-8 md:h-12 flex items-center justify-center transition-all duration-300 transform ${feedback ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
            {feedback && (
-             <span className={`px-6 py-2 rounded-full font-bold shadow-sm ${feedback.type === 'correct' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+             <span className={`px-6 py-2 rounded-full font-bold shadow-sm ${
+               feedback.type === 'correct' 
+                 ? 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300' 
+                 : 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300'
+             }`}>
                 {feedback.message}
              </span>
            )}
@@ -278,18 +289,19 @@ const App: React.FC = () => {
             <StaffCanvas 
                 clef={settings.clef} 
                 note={currentNote} 
+                darkMode={darkMode}
                 className="w-full h-full"
             />
             {/* Range Indicators (Optional visual flair) */}
             <div className="absolute top-2 right-2 flex gap-1">
                 {settings.selectedOctaves.map(o => (
-                    <span key={o} className="text-[10px] bg-slate-100 text-slate-400 px-1 rounded border border-slate-200">{o}</span>
+                    <span key={o} className="text-[10px] bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-400 px-1 rounded border border-slate-200 dark:border-slate-600">{o}</span>
                 ))}
             </div>
         </div>
 
         {/* Question Text */}
-        <p className="text-slate-400 font-medium text-lg">{t.question}</p>
+        <p className="text-slate-400 dark:text-slate-500 font-medium text-lg">{t.question}</p>
 
         {/* Keyboard */}
         <Keyboard 
@@ -304,7 +316,7 @@ const App: React.FC = () => {
       <div className="md:hidden p-4 w-full">
          <button 
             onClick={finishGame}
-            className="w-full py-3 bg-slate-200 text-slate-600 font-bold rounded-xl"
+            className="w-full py-3 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold rounded-xl"
         >
             {t.finishSession}
         </button>
@@ -319,27 +331,27 @@ const App: React.FC = () => {
         : 0;
 
     return (
-        <div className="bg-white p-6 md:p-8 rounded-3xl shadow-xl max-w-xl w-full text-center animate-fade-in my-8">
-            <h2 className="text-3xl font-bold text-slate-800 mb-2">{t.resultsTitle}</h2>
-            <p className="text-slate-500 mb-8">{t.sessionSummary}</p>
+        <div className="bg-white dark:bg-slate-800 p-6 md:p-8 rounded-3xl shadow-xl max-w-xl w-full text-center animate-fade-in my-8 transition-colors duration-200">
+            <h2 className="text-3xl font-bold text-slate-800 dark:text-white mb-2">{t.resultsTitle}</h2>
+            <p className="text-slate-500 dark:text-slate-400 mb-8">{t.sessionSummary}</p>
 
             {/* Summary Grid */}
             <div className="grid grid-cols-2 gap-4 mb-8">
-                <div className="bg-indigo-50 p-4 rounded-2xl">
-                    <div className="text-3xl font-bold text-indigo-600">{stats.correct}/{stats.total}</div>
-                    <div className="text-xs text-indigo-400 font-bold uppercase mt-1">{t.correct}</div>
+                <div className="bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-2xl">
+                    <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">{stats.correct}/{stats.total}</div>
+                    <div className="text-xs text-indigo-400 dark:text-indigo-300 font-bold uppercase mt-1">{t.correct}</div>
                 </div>
-                <div className="bg-emerald-50 p-4 rounded-2xl">
-                    <div className="text-3xl font-bold text-emerald-600">{accuracy}%</div>
-                    <div className="text-xs text-emerald-400 font-bold uppercase mt-1">{t.accuracy}</div>
+                <div className="bg-emerald-50 dark:bg-emerald-900/30 p-4 rounded-2xl">
+                    <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">{accuracy}%</div>
+                    <div className="text-xs text-emerald-400 dark:text-emerald-300 font-bold uppercase mt-1">{t.accuracy}</div>
                 </div>
-                <div className="bg-orange-50 p-4 rounded-2xl">
+                <div className="bg-orange-50 dark:bg-orange-900/30 p-4 rounded-2xl">
                     <div className="text-3xl font-bold text-orange-500">{stats.streak}</div>
-                    <div className="text-xs text-orange-400 font-bold uppercase mt-1">Best {t.streak}</div>
+                    <div className="text-xs text-orange-400 dark:text-orange-300 font-bold uppercase mt-1">Best {t.streak}</div>
                 </div>
-                <div className="bg-slate-50 p-4 rounded-2xl">
-                    <div className="text-3xl font-bold text-slate-600">{(avgTime / 1000).toFixed(1)}s</div>
-                    <div className="text-xs text-slate-400 font-bold uppercase mt-1">{t.avgTime}</div>
+                <div className="bg-slate-50 dark:bg-slate-700/50 p-4 rounded-2xl">
+                    <div className="text-3xl font-bold text-slate-600 dark:text-slate-300">{(avgTime / 1000).toFixed(1)}s</div>
+                    <div className="text-xs text-slate-400 dark:text-slate-500 font-bold uppercase mt-1">{t.avgTime}</div>
                 </div>
             </div>
 
@@ -347,58 +359,58 @@ const App: React.FC = () => {
             {noteStats.length > 0 && (
                 <div className="mb-8 text-left">
                     <div className="flex justify-between items-center mb-4">
-                        <h3 className="font-bold text-slate-700">{t.sortBy}</h3>
+                        <h3 className="font-bold text-slate-700 dark:text-slate-300">{t.sortBy}</h3>
                         <div className="flex gap-2">
                             <button 
                                 onClick={() => setSortMethod('difficulty')}
-                                className={`px-3 py-1 text-xs font-bold rounded-full transition-colors ${sortMethod === 'difficulty' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-500'}`}
+                                className={`px-3 py-1 text-xs font-bold rounded-full transition-colors ${sortMethod === 'difficulty' ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'}`}
                             >
                                 {t.sortDifficulty}
                             </button>
                             <button 
                                 onClick={() => setSortMethod('time')}
-                                className={`px-3 py-1 text-xs font-bold rounded-full transition-colors ${sortMethod === 'time' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-500'}`}
+                                className={`px-3 py-1 text-xs font-bold rounded-full transition-colors ${sortMethod === 'time' ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'}`}
                             >
                                 {t.sortTime}
                             </button>
                             <button 
                                 onClick={() => setSortMethod('name')}
-                                className={`px-3 py-1 text-xs font-bold rounded-full transition-colors ${sortMethod === 'name' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-500'}`}
+                                className={`px-3 py-1 text-xs font-bold rounded-full transition-colors ${sortMethod === 'name' ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'}`}
                             >
                                 {t.sortName}
                             </button>
                         </div>
                     </div>
                     
-                    <div className="overflow-hidden rounded-xl border border-slate-200">
+                    <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
                         <table className="w-full text-sm">
-                            <thead className="bg-slate-50 text-slate-500 font-semibold uppercase text-xs">
+                            <thead className="bg-slate-50 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 font-semibold uppercase text-xs">
                                 <tr>
                                     <th className="px-4 py-3 text-left">{t.statNote}</th>
                                     <th className="px-4 py-3 text-center">{t.statAccuracy}</th>
                                     <th className="px-4 py-3 text-right">{t.statTime}</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
                                 {noteStats.map((item) => (
-                                    <tr key={item.name} className="hover:bg-slate-50">
-                                        <td className="px-4 py-3 font-bold text-slate-700">
-                                            <span className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200">
+                                    <tr key={item.name} className="hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                                        <td className="px-4 py-3 font-bold text-slate-700 dark:text-slate-300">
+                                            <span className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center border border-slate-200 dark:border-slate-600">
                                                 {item.name}
                                             </span>
                                         </td>
                                         <td className="px-4 py-3 text-center">
                                             <div className="flex items-center justify-center gap-2">
-                                                <div className="w-16 h-2 bg-slate-100 rounded-full overflow-hidden">
+                                                <div className="w-16 h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
                                                     <div 
                                                         className={`h-full rounded-full ${item.accuracy >= 80 ? 'bg-emerald-500' : item.accuracy >= 50 ? 'bg-orange-400' : 'bg-red-500'}`}
                                                         style={{ width: `${item.accuracy}%` }}
                                                     />
                                                 </div>
-                                                <span className="text-xs font-medium text-slate-600">{Math.round(item.accuracy)}%</span>
+                                                <span className="text-xs font-medium text-slate-600 dark:text-slate-400">{Math.round(item.accuracy)}%</span>
                                             </div>
                                         </td>
-                                        <td className="px-4 py-3 text-right text-slate-600 font-mono">
+                                        <td className="px-4 py-3 text-right text-slate-600 dark:text-slate-300 font-mono">
                                             {(item.avgTime / 1000).toFixed(2)}s
                                         </td>
                                     </tr>
@@ -411,7 +423,7 @@ const App: React.FC = () => {
 
             <button
                 onClick={() => setScreen('setup')}
-                className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-lg shadow-lg shadow-indigo-200 transition-all"
+                className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-lg shadow-lg shadow-indigo-200 dark:shadow-none transition-all"
             >
                 {t.startNewSession}
             </button>
@@ -420,10 +432,31 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 flex items-center justify-center p-4">
-      {screen === 'setup' && renderSetup()}
-      {screen === 'game' && renderGame()}
-      {screen === 'results' && renderResults()}
+    <div className={darkMode ? 'dark' : ''}>
+      <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex items-center justify-center p-4 transition-colors duration-300">
+        {/* Global Dark Mode Toggle */}
+        <button 
+          onClick={toggleDarkMode}
+          className="fixed top-4 right-4 p-3 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-full shadow-lg z-50 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all"
+          aria-label="Toggle Dark Mode"
+        >
+          {darkMode ? (
+             // Sun Icon
+             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
+             </svg>
+          ) : (
+            // Moon Icon
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
+            </svg>
+          )}
+        </button>
+
+        {screen === 'setup' && renderSetup()}
+        {screen === 'game' && renderGame()}
+        {screen === 'results' && renderResults()}
+      </div>
     </div>
   );
 };
