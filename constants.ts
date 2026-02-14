@@ -24,7 +24,14 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     incorrectAnswer: 'Incorrect. It was',
     octave: 'Octave',
     noOctavesSelected: 'Please select at least one octave.',
-    avgTime: 'Avg Time'
+    avgTime: 'Avg Time',
+    statNote: 'Note',
+    statAccuracy: 'Accuracy',
+    statTime: 'Time',
+    sortBy: 'Sort by',
+    sortDifficulty: 'Difficulty',
+    sortName: 'Name',
+    sortTime: 'Time'
   },
   ru: {
     title: 'Мастер Нот',
@@ -49,7 +56,14 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     incorrectAnswer: 'Ошибка. Это была',
     octave: 'Октава',
     noOctavesSelected: 'Выберите хотя бы одну октаву.',
-    avgTime: 'Ср. время'
+    avgTime: 'Ср. время',
+    statNote: 'Нота',
+    statAccuracy: 'Точность',
+    statTime: 'Время',
+    sortBy: 'Сортировка',
+    sortDifficulty: 'Сложность',
+    sortName: 'Имя',
+    sortTime: 'Время'
   },
   uk: {
     title: 'Майстер Нот',
@@ -74,7 +88,14 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     incorrectAnswer: 'Помилка. Це була',
     octave: 'Октава',
     noOctavesSelected: 'Оберіть хоча б одну октаву.',
-    avgTime: 'Сер. час'
+    avgTime: 'Сер. час',
+    statNote: 'Нота',
+    statAccuracy: 'Точність',
+    statTime: 'Час',
+    sortBy: 'Сортувати',
+    sortDifficulty: 'Складність',
+    sortName: 'Назва',
+    sortTime: 'Час'
   },
   et: {
     title: 'Noodimeister',
@@ -99,7 +120,14 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     incorrectAnswer: 'Vale. See oli',
     octave: 'Oktav',
     noOctavesSelected: 'Palun vali vähemalt üks oktav.',
-    avgTime: 'Keskm. aeg'
+    avgTime: 'Keskm. aeg',
+    statNote: 'Noot',
+    statAccuracy: 'Täpsus',
+    statTime: 'Aeg',
+    sortBy: 'Sorteeri',
+    sortDifficulty: 'Raskus',
+    sortName: 'Nimi',
+    sortTime: 'Aeg'
   }
 };
 

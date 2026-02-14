@@ -52,4 +52,11 @@ export interface Translations {
   octave: string;
   noOctavesSelected: string;
   avgTime: string;
+  statNote: string;
+  statAccuracy: string;
+  statTime: string;
+  sortBy: string;
+  sortDifficulty: string;
+  sortName: string;
+  sortTime: string;
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { GameSettings, GameStats, Note, NoteName, Language, ClefType } from './types';
 import { TRANSLATIONS, OCTAVE_RANGES } from './constants';
 import { generateRandomNote } from './utils/musicLogic';
@@ -6,6 +6,7 @@ import StaffCanvas from './components/StaffCanvas';
 import Keyboard from './components/Keyboard';
 
 type Screen = 'setup' | 'game' | 'results';
+type SortMethod = 'difficulty' | 'name' | 'time';
 
 const App: React.FC = () => {
   // --- State ---
@@ -25,6 +26,7 @@ const App: React.FC = () => {
   const [lastCorrectNote, setLastCorrectNote] = useState<NoteName | null>(null);
   const [lastIncorrectNote, setLastIncorrectNote] = useState<NoteName | null>(null);
   const [startTime, setStartTime] = useState<number>(0);
+  const [sortMethod, setSortMethod] = useState<SortMethod>('difficulty');
 
   // Stats
   const [stats, setStats] = useState<GameStats>({
@@ -35,6 +37,35 @@ const App: React.FC = () => {
   });
 
   const t = TRANSLATIONS[settings.language];
+
+  // --- Derived State ---
+  // Moved useMemo to top level to comply with Rules of Hooks
+  const noteStats = useMemo(() => {
+      const groups: Record<string, { totalTime: number; correct: number; count: number }> = {};
+      
+      stats.history.forEach(item => {
+          const name = item.note.name;
+          if (!groups[name]) groups[name] = { totalTime: 0, correct: 0, count: 0 };
+          groups[name].totalTime += item.timeTaken;
+          groups[name].correct += item.correct ? 1 : 0;
+          groups[name].count += 1;
+      });
+
+      const rows = Object.entries(groups).map(([name, data]) => ({
+          name,
+          avgTime: data.totalTime / data.count,
+          accuracy: (data.correct / data.count) * 100,
+          count: data.count
+      }));
+
+      return rows.sort((a, b) => {
+          if (sortMethod === 'name') return a.name.localeCompare(b.name);
+          if (sortMethod === 'time') return b.avgTime - a.avgTime;
+          // difficulty: Lowest accuracy first, then highest time
+          if (a.accuracy !== b.accuracy) return a.accuracy - b.accuracy;
+          return b.avgTime - a.avgTime;
+      });
+  }, [stats.history, sortMethod]);
 
   // --- Handlers ---
 
@@ -288,10 +319,11 @@ const App: React.FC = () => {
         : 0;
 
     return (
-        <div className="bg-white p-6 md:p-10 rounded-3xl shadow-xl max-w-lg w-full text-center animate-fade-in">
+        <div className="bg-white p-6 md:p-8 rounded-3xl shadow-xl max-w-xl w-full text-center animate-fade-in my-8">
             <h2 className="text-3xl font-bold text-slate-800 mb-2">{t.resultsTitle}</h2>
             <p className="text-slate-500 mb-8">{t.sessionSummary}</p>
 
+            {/* Summary Grid */}
             <div className="grid grid-cols-2 gap-4 mb-8">
                 <div className="bg-indigo-50 p-4 rounded-2xl">
                     <div className="text-3xl font-bold text-indigo-600">{stats.correct}/{stats.total}</div>
@@ -310,6 +342,72 @@ const App: React.FC = () => {
                     <div className="text-xs text-slate-400 font-bold uppercase mt-1">{t.avgTime}</div>
                 </div>
             </div>
+
+            {/* Detailed Stats */}
+            {noteStats.length > 0 && (
+                <div className="mb-8 text-left">
+                    <div className="flex justify-between items-center mb-4">
+                        <h3 className="font-bold text-slate-700">{t.sortBy}</h3>
+                        <div className="flex gap-2">
+                            <button 
+                                onClick={() => setSortMethod('difficulty')}
+                                className={`px-3 py-1 text-xs font-bold rounded-full transition-colors ${sortMethod === 'difficulty' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-500'}`}
+                            >
+                                {t.sortDifficulty}
+                            </button>
+                            <button 
+                                onClick={() => setSortMethod('time')}
+                                className={`px-3 py-1 text-xs font-bold rounded-full transition-colors ${sortMethod === 'time' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-500'}`}
+                            >
+                                {t.sortTime}
+                            </button>
+                            <button 
+                                onClick={() => setSortMethod('name')}
+                                className={`px-3 py-1 text-xs font-bold rounded-full transition-colors ${sortMethod === 'name' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-500'}`}
+                            >
+                                {t.sortName}
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div className="overflow-hidden rounded-xl border border-slate-200">
+                        <table className="w-full text-sm">
+                            <thead className="bg-slate-50 text-slate-500 font-semibold uppercase text-xs">
+                                <tr>
+                                    <th className="px-4 py-3 text-left">{t.statNote}</th>
+                                    <th className="px-4 py-3 text-center">{t.statAccuracy}</th>
+                                    <th className="px-4 py-3 text-right">{t.statTime}</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                                {noteStats.map((item) => (
+                                    <tr key={item.name} className="hover:bg-slate-50">
+                                        <td className="px-4 py-3 font-bold text-slate-700">
+                                            <span className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200">
+                                                {item.name}
+                                            </span>
+                                        </td>
+                                        <td className="px-4 py-3 text-center">
+                                            <div className="flex items-center justify-center gap-2">
+                                                <div className="w-16 h-2 bg-slate-100 rounded-full overflow-hidden">
+                                                    <div 
+                                                        className={`h-full rounded-full ${item.accuracy >= 80 ? 'bg-emerald-500' : item.accuracy >= 50 ? 'bg-orange-400' : 'bg-red-500'}`}
+                                                        style={{ width: `${item.accuracy}%` }}
+                                                    />
+                                                </div>
+                                                <span className="text-xs font-medium text-slate-600">{Math.round(item.accuracy)}%</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-4 py-3 text-right text-slate-600 font-mono">
+                                            {(item.avgTime / 1000).toFixed(2)}s
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            )}
 
             <button
                 onClick={() => setScreen('setup')}
