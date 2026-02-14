@@ -1,0 +1,5 @@
+{
+  "name": "Note Master",
+  "description": "A comprehensive sheet music training application. Master reading notes on the staff with customizable octave ranges, clefs, and detailed statistics.",
+  "requestFramePermissions": []
+}
