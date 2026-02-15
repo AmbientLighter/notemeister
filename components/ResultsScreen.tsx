@@ -23,6 +23,7 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
     setSortMethod,
     setScreen
 }) => {
+    const [showDetails, setShowDetails] = React.useState(false);
     const accuracy = Math.round((stats.correct / (stats.total || 1)) * 100);
     const avgTime = stats.history.length
         ? Math.round(stats.history.reduce((acc, curr) => acc + curr.timeTaken, 0) / stats.history.length)
@@ -33,29 +34,16 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
             <h2 className="text-3xl font-bold text-slate-800 dark:text-white mb-2">{t.resultsTitle}</h2>
             <p className="text-slate-500 dark:text-slate-400 mb-8">{t.sessionSummary}</p>
 
-            {/* Summary Grid */}
-            <div className="grid grid-cols-2 gap-4 mb-8">
-                <div className="bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-2xl">
-                    <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">{stats.correct}/{stats.total}</div>
-                    <div className="text-xs text-indigo-400 dark:text-indigo-300 font-bold uppercase mt-1">{t.correct}</div>
-                </div>
-                <div className="bg-emerald-50 dark:bg-emerald-900/30 p-4 rounded-2xl">
-                    <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">{accuracy}%</div>
-                    <div className="text-xs text-emerald-400 dark:text-emerald-300 font-bold uppercase mt-1">{t.accuracy}</div>
-                </div>
-                <div className="bg-orange-50 dark:bg-orange-900/30 p-4 rounded-2xl">
-                    <div className="text-3xl font-bold text-orange-500">{stats.streak}</div>
-                    <div className="text-xs text-orange-400 dark:text-orange-300 font-bold uppercase mt-1">Best {t.streak}</div>
-                </div>
-                <div className="bg-slate-50 dark:bg-slate-700/50 p-4 rounded-2xl">
-                    <div className="text-3xl font-bold text-slate-600 dark:text-slate-300">{(avgTime / 1000).toFixed(1)}s</div>
-                    <div className="text-xs text-slate-400 dark:text-slate-500 font-bold uppercase mt-1">{t.avgTime}</div>
-                </div>
-            </div>
-
-            {/* Visual Heatmap */}
+            {/* Visual Heatmap - PRIMARY UI */}
             <div className="mb-8">
-                <h3 className="font-bold text-slate-700 dark:text-slate-300 mb-4 text-left font-mono uppercase text-xs tracking-wider">{t.performanceAnalysis || 'Performance Heatmap'}</h3>
+                <div className="flex justify-between items-end mb-4">
+                    <h3 className="font-bold text-slate-700 dark:text-slate-300 font-mono uppercase text-xs tracking-wider">{t.performanceAnalysis || 'Performance Analysis'}</h3>
+                    <div className="flex gap-2 text-[10px] font-bold uppercase tracking-tighter">
+                        <span className="text-emerald-500">Perfect</span>
+                        <span className="text-slate-300">→</span>
+                        <span className="text-red-500">Practice</span>
+                    </div>
+                </div>
                 <HeatmapCanvas
                     noteStats={noteStats}
                     clef={clef}
@@ -63,27 +51,57 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
                 />
             </div>
 
-            {/* Detailed Stats */}
-            {noteStats.length > 0 && (
-                <div className="mb-8 text-left">
+            {/* Summary Grid */}
+            <div className="grid grid-cols-2 gap-3 mb-8">
+                <div className="bg-indigo-50 dark:bg-indigo-900/30 p-3 rounded-2xl">
+                    <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{stats.correct}/{stats.total}</div>
+                    <div className="text-[10px] text-indigo-400 dark:text-indigo-300 font-bold uppercase mt-1">{t.correct}</div>
+                </div>
+                <div className="bg-emerald-50 dark:bg-emerald-900/30 p-3 rounded-2xl">
+                    <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{accuracy}%</div>
+                    <div className="text-[10px] text-emerald-400 dark:text-emerald-300 font-bold uppercase mt-1">{t.accuracy}</div>
+                </div>
+                <div className="bg-orange-50 dark:bg-orange-900/30 p-3 rounded-2xl">
+                    <div className="text-2xl font-bold text-orange-500">{stats.streak}</div>
+                    <div className="text-[10px] text-orange-400 dark:text-orange-300 font-bold uppercase mt-1">{t.streak}</div>
+                </div>
+                <div className="bg-slate-50 dark:bg-slate-700/50 p-3 rounded-2xl">
+                    <div className="text-2xl font-bold text-slate-600 dark:text-slate-300">{(avgTime / 1000).toFixed(1)}s</div>
+                    <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase mt-1">{t.avgTime}</div>
+                </div>
+            </div>
+
+            <button
+                onClick={() => setShowDetails(!showDetails)}
+                className="mb-8 text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center justify-center gap-1 mx-auto"
+            >
+                {showDetails ? 'Hide Details' : 'Show Detailed Statistics'}
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={`w-4 h-4 transition-transform ${showDetails ? 'rotate-180' : ''}`}>
+                    <path fillRule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
+                </svg>
+            </button>
+
+            {/* Detailed Stats - HIDDEN BY DEFAULT */}
+            {showDetails && noteStats.length > 0 && (
+                <div className="mb-8 text-left animate-slide-down">
                     <div className="flex justify-between items-center mb-4">
                         <h3 className="font-bold text-slate-700 dark:text-slate-300">{t.sortBy}</h3>
-                        <div className="flex gap-2">
+                        <div className="flex gap-1">
                             <button
                                 onClick={() => setSortMethod('difficulty')}
-                                className={`px-3 py-1 text-xs font-bold rounded-full transition-colors ${sortMethod === 'difficulty' ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'}`}
+                                className={`px-2 py-1 text-[10px] font-bold rounded-full transition-colors ${sortMethod === 'difficulty' ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'}`}
                             >
                                 {t.sortDifficulty}
                             </button>
                             <button
                                 onClick={() => setSortMethod('time')}
-                                className={`px-3 py-1 text-xs font-bold rounded-full transition-colors ${sortMethod === 'time' ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'}`}
+                                className={`px-2 py-1 text-[10px] font-bold rounded-full transition-colors ${sortMethod === 'time' ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'}`}
                             >
                                 {t.sortTime}
                             </button>
                             <button
                                 onClick={() => setSortMethod('name')}
-                                className={`px-3 py-1 text-xs font-bold rounded-full transition-colors ${sortMethod === 'name' ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'}`}
+                                className={`px-2 py-1 text-[10px] font-bold rounded-full transition-colors ${sortMethod === 'name' ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'}`}
                             >
                                 {t.sortName}
                             </button>
