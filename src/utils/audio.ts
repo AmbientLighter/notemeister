@@ -1,5 +1,6 @@
 import * as Tone from 'tone';
 import type { Instrument, Note } from '../types';
+import { BASE_URL } from '../constants';
 
 class AudioEngine {
   private samplers: Partial<Record<Instrument, Tone.Sampler>> = {};
@@ -9,17 +10,17 @@ class AudioEngine {
     // Start loading samples immediately to have them ready as soon as possible
     this.samplers.piano = new Tone.Sampler({
       urls: { C4: 'C4.mp3', G4: 'G4.mp3', C5: 'C5.mp3' },
-      baseUrl: '/notemeister/samples/piano/',
+      baseUrl: `${BASE_URL}samples/piano/`,
     }).toDestination();
 
     this.samplers.guitar = new Tone.Sampler({
       urls: { C4: 'C4.mp3', G4: 'G4.mp3', C5: 'C5.mp3' },
-      baseUrl: '/notemeister/samples/guitar/',
+      baseUrl: `${BASE_URL}samples/guitar/`,
     }).toDestination();
 
     this.samplers.flute = new Tone.Sampler({
       urls: { C4: 'C4.mp3', A4: 'A4.mp3', C5: 'C5.mp3' },
-      baseUrl: '/notemeister/samples/flute/',
+      baseUrl: `${BASE_URL}samples/flute/`,
     }).toDestination();
   }
 

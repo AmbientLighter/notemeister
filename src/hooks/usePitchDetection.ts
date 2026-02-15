@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { NOTE_NAMES } from '../constants';
 import PitchWorker from '../workers/pitchWorker?worker';
 import { getNoteFromFrequency } from '../utils/musicLogic';
+import { BASE_URL } from '../constants';
 
 export const usePitchDetection = () => {
   const [note, setNote] = useState<string>('-');
@@ -66,7 +66,7 @@ export const usePitchDetection = () => {
 
       // 3. Load AudioWorklet
       // Note: we assume pitch-processor.js is in public/
-      await audioCtx.audioWorklet.addModule('/notemeister/pitch-processor.js');
+      await audioCtx.audioWorklet.addModule(`${BASE_URL}pitch-processor.js`);
 
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const source = audioCtx.createMediaStreamSource(stream);

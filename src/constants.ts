@@ -1,5 +1,8 @@
 import type { Translations, Language, NoteName } from './types';
 
+export const APP_NAME = 'notemeister';
+export const BASE_URL = `/${APP_NAME}/`;
+
 export const TRANSLATIONS: Record<Language, Translations> = {
   en: {
     title: 'Note Master',
