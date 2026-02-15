@@ -105,9 +105,7 @@ const HeatmapCanvas: React.FC<HeatmapCanvasProps> = ({ noteStats, clef }) => {
     }, [noteStats, clef, darkMode]);
 
     return (
-        <div className="w-full bg-slate-50/50 dark:bg-slate-900/50 rounded-2xl p-4 overflow-hidden transition-colors duration-200">
-            <div ref={containerRef} className="w-full" style={{ height: '150px' }} />
-        </div>
+        <div ref={containerRef} className="w-full" style={{ height: '150px' }} />
     );
 };
 

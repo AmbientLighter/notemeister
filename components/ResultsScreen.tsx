@@ -1,14 +1,24 @@
 import React from 'react';
-import { useTranslations } from '../hooks/useTranslations';
 import { useGameStore } from '../store/useGameStore';
-import DetailedStats from './DetailedStats';
+import { useTranslations } from '../hooks/useTranslations';
+import { Check } from 'lucide-react';
 import HeatmapCanvas from './HeatmapCanvas';
+import DetailedStats from './DetailedStats';
 import SummaryGrid from './SummaryGrid';
+import FloatingNotes from './FloatingNotes';
 
 const ResultsScreen: React.FC = () => {
     const { t } = useTranslations();
     const settings = useGameStore((state) => state.settings);
     const stats = useGameStore((state) => state.stats);
+    const setScreen = useGameStore((state) => state.setScreen);
+
+    const [showDetails, setShowDetails] = React.useState(false);
+    const [isVisible, setIsVisible] = React.useState(false);
+
+    React.useEffect(() => {
+        setIsVisible(true);
+    }, []);
 
     const noteStats = React.useMemo(() => {
         const groups: Record<string, { totalTime: number; correct: number; count: number }> = {};
@@ -29,53 +39,119 @@ const ResultsScreen: React.FC = () => {
         }));
     }, [stats.history]);
 
-    // Actions
-    const setScreen = useGameStore((state) => state.setScreen);
-    const [showDetails, setShowDetails] = React.useState(false);
+    const { overallAccuracy, weakestNotes } = React.useMemo(() => {
+        const total = stats.history.length;
+        const correct = stats.history.filter(h => h.correct).length;
+        const accuracy = total > 0 ? (correct / total) * 100 : 0;
 
+        const weakest = noteStats
+            .filter(s => s.accuracy < 80)
+            .sort((a, b) => a.accuracy - b.accuracy)
+            .slice(0, 3)
+            .map(s => s.name);
+
+        return { overallAccuracy: accuracy, weakestNotes: weakest };
+    }, [stats.history, noteStats]);
+
+    const feedbackText = React.useMemo(() => {
+        if (overallAccuracy >= 95) return "Absolute Mastery! Your precision is flawless.";
+        if (overallAccuracy >= 85) return "Exemplary! You're becoming highly fluent.";
+        if (overallAccuracy >= 70) return "Great Progress! Keep honing that muscle memory.";
+        if (overallAccuracy >= 50) return "Getting There! Focus on accuracy over speed.";
+        return "Keep Practicing! Every session builds your skill.";
+    }, [overallAccuracy]);
 
     return (
-        <div className="bg-white dark:bg-slate-800 p-4 sm:p-6 md:p-8 sm:rounded-3xl shadow-xl sm:max-w-xl w-full text-center animate-fade-in sm:my-8 transition-colors duration-200">
-            <h2 className="text-3xl font-bold text-slate-800 dark:text-white mb-2">{t.resultsTitle}</h2>
-            <p className="text-slate-500 dark:text-slate-400 mb-8">{t.sessionSummary}</p>
+        <>
+            {/* Animated Background Layers */}
+            <FloatingNotes />
 
-            {/* Visual Heatmap - PRIMARY UI */}
-            <div className="mb-8">
-                <div className="flex justify-between items-end mb-4">
-                    <h3 className="font-bold text-slate-700 dark:text-slate-300 font-mono uppercase text-xs tracking-wider">{t.performanceAnalysis}</h3>
-                    <div className="flex gap-2 text-[10px] font-bold uppercase tracking-tighter">
-                        <span className="text-emerald-500">Perfect</span>
-                        <span className="text-slate-300">→</span>
-                        <span className="text-red-500">Practice</span>
-                    </div>
-                </div>
-                <HeatmapCanvas
-                    noteStats={noteStats}
-                    clef={settings.clef}
-                />
+            <div className="fixed inset-0 opacity-5 pointer-events-none z-0">
+                <div className="absolute top-1/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-indigo-900 dark:via-indigo-100 to-transparent"></div>
+                <div className="absolute top-2/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-indigo-900 dark:via-indigo-100 to-transparent"></div>
+                <div className="absolute top-3/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-indigo-900 dark:via-indigo-100 to-transparent"></div>
             </div>
 
-            <SummaryGrid />
+            {/* Main content container */}
+            <div className={`relative z-10 w-full max-w-2xl pt-0 px-6 sm:px-12 pb-6 sm:pb-12 transition-all duration-1000 transform ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}
+                sm:bg-white/80 sm:dark:bg-slate-800/80 sm:backdrop-blur-3xl sm:rounded-[3rem] sm:shadow-2xl sm:border sm:border-white/50 sm:dark:border-slate-700/50`}>
 
-            <button
-                onClick={() => setShowDetails(!showDetails)}
-                className="mb-8 text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center justify-center gap-1 mx-auto"
-            >
-                {showDetails ? 'Hide Details' : 'Show Detailed Statistics'}
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={`w-4 h-4 transition-transform ${showDetails ? 'rotate-180' : ''}`}>
-                    <path fillRule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
-                </svg>
-            </button>
+                {/* Success icon with pulsing animation */}
+                <div className={`pt-12 mb-8 flex justify-center transition-all duration-700 delay-200 ${isVisible ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`}>
+                    <div className="relative">
+                        <div className="absolute inset-0 rounded-full bg-indigo-400 dark:bg-indigo-500 animate-ping opacity-20"></div>
+                        <div className="absolute inset-0 rounded-full bg-indigo-300 dark:bg-indigo-400 animate-pulse opacity-30"></div>
+                        <div className="relative bg-gradient-to-br from-indigo-600 to-purple-700 rounded-full p-6 shadow-xl">
+                            <Check size={48} className="text-white" strokeWidth={3} />
+                        </div>
+                    </div>
+                </div>
 
-            {showDetails && <DetailedStats noteStats={noteStats} />}
+                {/* Success message */}
+                <div className={`text-center space-y-2 mb-12 transition-all duration-700 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                    <h1 className="text-5xl sm:text-6xl font-bold bg-gradient-to-r from-indigo-800 via-purple-700 to-blue-800 dark:from-indigo-200 dark:via-purple-200 dark:to-blue-200 bg-clip-text text-transparent">
+                        {t.resultsTitle}
+                    </h1>
+                    <p className="text-xl text-slate-700 dark:text-slate-300 font-bold tracking-tight">
+                        {feedbackText}
+                    </p>
+                    {weakestNotes.length > 0 && (
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
+                            Focus on: <span className="font-mono bg-indigo-50 dark:bg-slate-900/50 px-2 py-0.5 rounded border border-indigo-100 dark:border-slate-700">{weakestNotes.join(', ')}</span>
+                        </p>
+                    )}
+                </div>
 
-            <button
-                onClick={() => setScreen('setup')}
-                className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-lg shadow-lg shadow-indigo-200 dark:shadow-none transition-all"
-            >
-                {t.startNewSession}
-            </button>
-        </div>
+                {/* Primary Stats (Heatmap) */}
+                <div className={`mb-12 transition-all duration-700 delay-600 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                    <div className="flex justify-between items-center mb-6 px-2">
+                        <h3 className="font-bold text-slate-500 dark:text-slate-500 uppercase text-xs tracking-[0.2em]">{t.performanceAnalysis}</h3>
+                    </div>
+                    <HeatmapCanvas noteStats={noteStats} clef={settings.clef} />
+                </div>
+
+                {/* Action Buttons */}
+                <div className={`mb-8 grid grid-cols-1 sm:grid-cols-2 gap-6 mt-12 transition-all duration-700 delay-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                    <button
+                        onClick={() => setScreen('setup')}
+                        className="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white py-5 px-8 rounded-2xl font-bold shadow-xl shadow-indigo-200 dark:shadow-none hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-lg"
+                    >
+                        {t.startNewSession}
+                    </button>
+                    <button
+                        onClick={() => setShowDetails(!showDetails)}
+                        className="bg-white/50 dark:bg-slate-700/50 backdrop-blur-sm text-indigo-800 dark:text-indigo-200 py-5 px-8 rounded-2xl font-bold border-2 border-white/80 dark:border-slate-600/50 hover:bg-white/80 dark:hover:bg-slate-600 transition-all text-lg shadow-lg"
+                    >
+                        {showDetails ? 'Back to Overview' : 'Review Progress'}
+                    </button>
+                </div>
+
+                {/* Toggleable Details */}
+                <div className={`mt-8 transition-all duration-700 delay-800 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                    {showDetails && (
+                        <>
+                            <div className="bg-white/30 dark:bg-slate-800/30 backdrop-blur-md p-6 rounded-3xl border border-white/50 dark:border-slate-700/50 shadow-lg">
+                                <SummaryGrid />
+                            </div>
+                            <div className="mt-8 bg-white/30 dark:bg-slate-800/30 backdrop-blur-md p-6 rounded-3xl border border-white/50 dark:border-slate-700/50 shadow-lg animate-fade-in">
+                                <DetailedStats noteStats={noteStats} />
+                            </div>
+                        </>
+                    )}
+                </div>
+
+                {/* Quotation / Motivation */}
+                <div className={`mt-12 text-center transition-all duration-1000 delay-[1200ms] ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm font-medium italic">
+                        {overallAccuracy >= 90
+                            ? "Expert performance! Your hard work is clearly paying off. 🎹"
+                            : overallAccuracy >= 70
+                                ? "Strong progress! You're building a solid foundation. 🎵"
+                                : "Consistency is key. Keep playing and your fingers will find the way! ✨"}
+                    </p>
+                </div>
+            </div>
+        </>
     );
 };
 
