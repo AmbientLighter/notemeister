@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useMemo } from 'react';
-import { ClefType, Note, NoteName } from '../types';
+import { ClefType, Note } from '../types';
 import { NOTE_NAMES, OCTAVE_RANGES } from '../constants';
 import { getNoteVisualPosition, getNoteKey, parseNoteKey } from '../utils/musicLogic';
 
@@ -24,9 +24,9 @@ const InteractiveStaff: React.FC<InteractiveStaffProps> = ({
   const activeOctaves = useMemo(() => {
     const octs = new Set<number>();
     activeNotes.forEach(key => {
-        // Parse "C4" -> 4
-        const note = parseNoteKey(key);
-        octs.add(note.octave);
+      // Parse "C4" -> 4
+      const note = parseNoteKey(key);
+      octs.add(note.octave);
     });
     return octs;
   }, [activeNotes]);
@@ -38,12 +38,12 @@ const InteractiveStaff: React.FC<InteractiveStaffProps> = ({
   const displayOctaves = useMemo(() => {
     // If multiple octaves involved, show everything ("Full Blown")
     if (activeOctaves.size > 1) {
-        return OCTAVE_RANGES[clef];
+      return OCTAVE_RANGES[clef];
     }
-    
+
     // If single octave selected, show just that one
     if (activeOctaves.size === 1) {
-        return [Array.from(activeOctaves)[0]];
+      return [Array.from(activeOctaves)[0]];
     }
 
     // Default fallback if nothing selected
@@ -57,10 +57,10 @@ const InteractiveStaff: React.FC<InteractiveStaffProps> = ({
     const notes: Note[] = [];
     displayOctaves.forEach(octave => {
       NOTE_NAMES.forEach(name => {
-        notes.push({ 
-            name, 
-            octave, 
-            absoluteIndex: 0 
+        notes.push({
+          name,
+          octave,
+          absoluteIndex: 0
         });
       });
     });
@@ -75,7 +75,7 @@ const InteractiveStaff: React.FC<InteractiveStaffProps> = ({
     if (!ctx) return;
 
     const dpr = window.devicePixelRatio || 1;
-    
+
     // Config
     const noteSpacing = 40;
     const paddingX = 40;
@@ -86,7 +86,7 @@ const InteractiveStaff: React.FC<InteractiveStaffProps> = ({
     // Resize Canvas
     canvas.width = totalWidth * dpr;
     canvas.height = height * dpr;
-    
+
     // Style adjustments for CSS size vs Actual size
     canvas.style.width = `${totalWidth}px`;
     canvas.style.height = `${height}px`;
@@ -103,7 +103,7 @@ const InteractiveStaff: React.FC<InteractiveStaffProps> = ({
     ctx.clearRect(0, 0, totalWidth, height);
 
     // Geometry
-    const staffHeight = 50; 
+    const staffHeight = 50;
     const staffTopY = (height - staffHeight) / 2 - 10;
     const lineSpacing = staffHeight / 4;
     const staffStartX = 20;
@@ -129,11 +129,11 @@ const InteractiveStaff: React.FC<InteractiveStaffProps> = ({
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     const clefX = staffStartX + 30;
-    
+
     if (clef === 'treble') {
-       ctx.fillText('𝄞', clefX, staffTopY + (3 * lineSpacing)); 
+      ctx.fillText('𝄞', clefX, staffTopY + (3 * lineSpacing));
     } else {
-       ctx.fillText('𝄢', clefX, staffTopY + (1 * lineSpacing)); 
+      ctx.fillText('𝄢', clefX, staffTopY + (1 * lineSpacing));
     }
 
     // Draw Notes
@@ -150,34 +150,34 @@ const InteractiveStaff: React.FC<InteractiveStaffProps> = ({
       const ledgerWidth = 24;
       ctx.strokeStyle = lineColor;
       ctx.lineWidth = 1;
-      
+
       if (stepsFromTop < 0) { // Above
         for (let s = -2; s >= stepsFromTop; s -= 2) {
           const ly = staffTopY + (s * (lineSpacing / 2));
           ctx.beginPath();
-          ctx.moveTo(x - ledgerWidth/2, ly);
-          ctx.lineTo(x + ledgerWidth/2, ly);
+          ctx.moveTo(x - ledgerWidth / 2, ly);
+          ctx.lineTo(x + ledgerWidth / 2, ly);
           ctx.stroke();
         }
       } else if (stepsFromTop > 8) { // Below
         for (let s = 10; s <= stepsFromTop; s += 2) {
           const ly = staffTopY + (s * (lineSpacing / 2));
           ctx.beginPath();
-          ctx.moveTo(x - ledgerWidth/2, ly);
-          ctx.lineTo(x + ledgerWidth/2, ly);
+          ctx.moveTo(x - ledgerWidth / 2, ly);
+          ctx.lineTo(x + ledgerWidth / 2, ly);
           ctx.stroke();
         }
       }
 
       // Note Head
       if (isSelected) {
-          ctx.fillStyle = activeColor;
+        ctx.fillStyle = activeColor;
       } else if (isHovered) {
-          ctx.fillStyle = hoverColor;
+        ctx.fillStyle = hoverColor;
       } else {
-          ctx.fillStyle = inactiveColor;
+        ctx.fillStyle = inactiveColor;
       }
-      
+
       ctx.beginPath();
       const radiusX = lineSpacing * 0.65;
       const radiusY = lineSpacing * 0.5;
@@ -188,7 +188,7 @@ const InteractiveStaff: React.FC<InteractiveStaffProps> = ({
       ctx.fillStyle = isSelected ? (darkMode ? '#fff' : '#000') : (darkMode ? '#475569' : '#94a3b8');
       ctx.font = `bold 12px sans-serif`;
       ctx.textAlign = 'center';
-      
+
       const labelY = staffTopY + staffHeight + 35;
       ctx.fillText(key, x, labelY);
 
@@ -197,7 +197,7 @@ const InteractiveStaff: React.FC<InteractiveStaffProps> = ({
         ctx.beginPath();
         ctx.arc(x, labelY + 14, 3, 0, 2 * Math.PI);
         ctx.fill();
-     }
+      }
     });
 
   }, [clef, activeNotes, hoveredKey, darkMode, displayNotes]);
@@ -207,24 +207,24 @@ const InteractiveStaff: React.FC<InteractiveStaffProps> = ({
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
-    
+
     // Reverse engineer x to index
     const staffStartX = 20;
     const clefSpace = 60;
     const noteSpacing = 40;
     const startOfNotes = staffStartX + clefSpace;
 
-    if (x < startOfNotes - noteSpacing/2) {
-        setHoveredKey(null);
-        return;
+    if (x < startOfNotes - noteSpacing / 2) {
+      setHoveredKey(null);
+      return;
     }
 
     const index = Math.round((x - startOfNotes) / noteSpacing);
-    
+
     if (index >= 0 && index < displayNotes.length) {
-        setHoveredKey(getNoteKey(displayNotes[index]));
+      setHoveredKey(getNoteKey(displayNotes[index]));
     } else {
-        setHoveredKey(null);
+      setHoveredKey(null);
     }
   };
 
@@ -234,28 +234,28 @@ const InteractiveStaff: React.FC<InteractiveStaffProps> = ({
 
   const handleClick = (e: React.MouseEvent) => {
     if (hoveredKey) {
-        onToggleNote(hoveredKey);
+      onToggleNote(hoveredKey);
     }
   };
 
   return (
     <div className="w-full">
-        {/* Scrollable Container with centering if content is small */}
-        <div 
-          ref={containerRef} 
-          className={`w-full overflow-x-auto pb-4 custom-scrollbar flex ${isMultiOctaveView ? 'justify-start' : 'justify-center'}`}
-        >
-            <canvas
-                ref={canvasRef}
-                className="cursor-pointer bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 flex-shrink-0"
-                onMouseMove={handleMouseMove}
-                onMouseLeave={handleMouseLeave}
-                onClick={handleClick}
-            />
-        </div>
-        <div className="text-center text-xs text-slate-400 mt-1">
-            {isMultiOctaveView ? 'Scroll to see more octaves • ' : ''} Click notes to toggle
-        </div>
+      {/* Scrollable Container with centering if content is small */}
+      <div
+        ref={containerRef}
+        className={`w-full overflow-x-auto pb-4 custom-scrollbar flex ${isMultiOctaveView ? 'justify-start' : 'justify-center'}`}
+      >
+        <canvas
+          ref={canvasRef}
+          className="cursor-pointer bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 flex-shrink-0"
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+          onClick={handleClick}
+        />
+      </div>
+      <div className="text-center text-xs text-slate-400 mt-1">
+        {isMultiOctaveView ? 'Scroll to see more octaves • ' : ''} Click notes to toggle
+      </div>
     </div>
   );
 };

@@ -19,9 +19,16 @@ export const useNoteMeister = () => {
         return () => mediaQuery.removeEventListener('change', handleChange);
     }, []);
 
+    // Language Detection
+    const detectLanguage = (): Language => {
+        const browserLang = (navigator.language || (navigator as any).userLanguage || 'en').split('-')[0];
+        const supported: Language[] = ['en', 'ru', 'uk', 'et'];
+        return supported.includes(browserLang as Language) ? (browserLang as Language) : 'en';
+    };
+
     // Settings
     const [settings, setSettings] = useState<GameSettings>({
-        language: 'en',
+        language: detectLanguage(),
         clef: 'treble',
         activeNotes: [],
         tempo: 'normal',

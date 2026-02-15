@@ -1,6 +1,6 @@
 import React from 'react';
 import { GameSettings, Language, ClefType, Instrument } from '../types';
-import { OCTAVE_RANGES, TRANSLATIONS } from '../constants';
+import { OCTAVE_RANGES } from '../constants';
 import InteractiveStaff from './InteractiveStaff';
 
 interface SetupScreenProps {
