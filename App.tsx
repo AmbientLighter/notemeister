@@ -3,6 +3,7 @@ import { GameSettings, GameStats, Note, NoteName, Language, ClefType, Tempo } fr
 import { TRANSLATIONS, OCTAVE_RANGES, NOTE_NAMES } from './constants';
 import { generateRandomNote } from './utils/musicLogic';
 import StaffCanvas from './components/StaffCanvas';
+import InteractiveStaff from './components/InteractiveStaff';
 import Keyboard from './components/Keyboard';
 
 type Screen = 'setup' | 'game' | 'results';
@@ -271,21 +272,14 @@ const App: React.FC = () => {
       {/* Note Selection */}
       <div className="mb-8">
         <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-wide">{t.selectNotes}</label>
-        <div className="flex flex-wrap gap-2 justify-center">
-          {NOTE_NAMES.map(note => (
-            <button
-              key={note}
-              onClick={() => toggleNote(note)}
-              className={`w-10 h-10 rounded-lg font-bold text-lg flex items-center justify-center transition-all ${
-                settings.selectedNotes.includes(note)
-                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200 dark:shadow-none scale-105'
-                  : 'bg-white dark:bg-slate-700 border-2 border-slate-200 dark:border-slate-600 text-slate-400 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-500'
-              }`}
-            >
-              {note}
-            </button>
-          ))}
-        </div>
+        
+        <InteractiveStaff 
+          clef={settings.clef}
+          selectedNotes={settings.selectedNotes}
+          onToggleNote={toggleNote}
+          darkMode={darkMode}
+        />
+
         {settings.selectedNotes.length === 0 && (
           <p className="text-red-500 text-sm mt-2 text-center">{t.noNotesSelected}</p>
         )}
