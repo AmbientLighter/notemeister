@@ -1,9 +1,9 @@
-import * as Tone from 'tone';
 import type { Instrument, Note } from '../types';
 import { BASE_URL } from '../constants';
 
 class AudioEngine {
-  private samplers: Partial<Record<Instrument, Tone.Sampler>> = {};
+  private Tone: any = null;
+  private samplers: Partial<Record<Instrument, any>> = {};
   private initialized = false;
 
   private configs: Partial<Record<Instrument, { urls: Record<string, string>; path: string }>> = {
@@ -23,13 +23,15 @@ class AudioEngine {
 
   constructor() {}
 
-  private async getSampler(instrument: Instrument): Promise<Tone.Sampler | undefined> {
+  private async getSampler(instrument: Instrument): Promise<any> {
     if (instrument === 'silence' || instrument === 'microphone') return undefined;
+
+    await this.init();
 
     // Return cached sampler if it already exists
     if (this.samplers[instrument]) {
       const sampler = this.samplers[instrument]!;
-      if (!sampler.loaded) await Tone.loaded();
+      if (!sampler.loaded) await this.Tone.loaded();
       return sampler;
     }
 
@@ -37,13 +39,13 @@ class AudioEngine {
     const config = this.configs[instrument];
     if (config) {
       console.log(`[AudioEngine] Lazily loading instrument: ${instrument}`);
-      const sampler = new Tone.Sampler({
+      const sampler = new this.Tone.Sampler({
         urls: config.urls,
         baseUrl: `${BASE_URL}${config.path}`,
       }).toDestination();
 
       this.samplers[instrument] = sampler;
-      await Tone.loaded();
+      await this.Tone.loaded();
       return sampler;
     }
 
@@ -52,12 +54,19 @@ class AudioEngine {
 
   public async init() {
     if (this.initialized) return;
-    await Tone.start();
+
+    // Lazy load Tone.js
+    if (!this.Tone) {
+      console.log('[AudioEngine] Lazily importing Tone.js...');
+      this.Tone = await import('tone');
+    }
+
+    await this.Tone.start();
     this.initialized = true;
+    console.log('[AudioEngine] Tone.js initialized');
   }
 
   public async playNote(note: Note, instrument: Instrument) {
-    await this.init();
     const sampler = await this.getSampler(instrument);
     if (sampler) {
       sampler.triggerAttackRelease(`${note.name}${note.octave}`, '2n');
@@ -65,11 +74,10 @@ class AudioEngine {
   }
 
   public async playMelody(type: 'success' | 'failure', instrument: Instrument) {
-    await this.init();
     const sampler = await this.getSampler(instrument);
     if (!sampler) return;
 
-    const now = Tone.now();
+    const now = this.Tone.now();
 
     if (type === 'success') {
       // Triumphant level-up style fanfare
