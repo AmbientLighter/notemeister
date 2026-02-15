@@ -30,7 +30,7 @@ const SetupScreen: React.FC = () => {
       {/* Interactive Staff Selection */}
       <div className="mb-10">
         <OctaveSelector />
-        <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-4 uppercase tracking-widest">
+        <label className="block text-center text-sm font-bold text-slate-700 dark:text-slate-300 mb-4 uppercase tracking-widest">
           {t.selectNotes}
         </label>
         <InteractiveStaff

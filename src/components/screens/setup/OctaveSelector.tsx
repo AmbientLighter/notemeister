@@ -11,7 +11,7 @@ const OctaveSelector: React.FC = () => {
 
   return (
     <div className="mb-8">
-      <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-widest">
+      <label className="block text-center text-sm font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-widest">
         {t.selectOctaves}
       </label>
       <div className="flex flex-wrap gap-3 justify-center">
