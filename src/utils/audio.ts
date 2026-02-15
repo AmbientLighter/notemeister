@@ -6,22 +6,48 @@ class AudioEngine {
   private samplers: Partial<Record<Instrument, Tone.Sampler>> = {};
   private initialized = false;
 
-  constructor() {
-    // Start loading samples immediately to have them ready as soon as possible
-    this.samplers.piano = new Tone.Sampler({
+  private configs: Partial<Record<Instrument, { urls: Record<string, string>; path: string }>> = {
+    piano: {
       urls: { C4: 'C4.mp3', G4: 'G4.mp3', C5: 'C5.mp3' },
-      baseUrl: `${BASE_URL}samples/piano/`,
-    }).toDestination();
-
-    this.samplers.guitar = new Tone.Sampler({
+      path: 'samples/piano/',
+    },
+    guitar: {
       urls: { C4: 'C4.mp3', G4: 'G4.mp3', C5: 'C5.mp3' },
-      baseUrl: `${BASE_URL}samples/guitar/`,
-    }).toDestination();
-
-    this.samplers.flute = new Tone.Sampler({
+      path: 'samples/guitar/',
+    },
+    flute: {
       urls: { C4: 'C4.mp3', A4: 'A4.mp3', C5: 'C5.mp3' },
-      baseUrl: `${BASE_URL}samples/flute/`,
-    }).toDestination();
+      path: 'samples/flute/',
+    },
+  };
+
+  constructor() {}
+
+  private async getSampler(instrument: Instrument): Promise<Tone.Sampler | undefined> {
+    if (instrument === 'silence' || instrument === 'microphone') return undefined;
+
+    // Return cached sampler if it already exists
+    if (this.samplers[instrument]) {
+      const sampler = this.samplers[instrument]!;
+      if (!sampler.loaded) await Tone.loaded();
+      return sampler;
+    }
+
+    // Create new sampler if config exists
+    const config = this.configs[instrument];
+    if (config) {
+      console.log(`[AudioEngine] Lazily loading instrument: ${instrument}`);
+      const sampler = new Tone.Sampler({
+        urls: config.urls,
+        baseUrl: `${BASE_URL}${config.path}`,
+      }).toDestination();
+
+      this.samplers[instrument] = sampler;
+      await Tone.loaded();
+      return sampler;
+    }
+
+    return undefined;
   }
 
   public async init() {
@@ -31,31 +57,17 @@ class AudioEngine {
   }
 
   public async playNote(note: Note, instrument: Instrument) {
-    if (instrument === 'silence') return;
-
     await this.init();
-
-    const sampler = this.samplers[instrument];
+    const sampler = await this.getSampler(instrument);
     if (sampler) {
-      // If not loaded yet, wait for all Tone.js assets to load
-      if (!sampler.loaded) {
-        await Tone.loaded();
-      }
       sampler.triggerAttackRelease(`${note.name}${note.octave}`, '2n');
     }
   }
 
   public async playMelody(type: 'success' | 'failure', instrument: Instrument) {
-    if (instrument === 'silence') return;
-
     await this.init();
-
-    const sampler = this.samplers[instrument];
+    const sampler = await this.getSampler(instrument);
     if (!sampler) return;
-
-    if (!sampler.loaded) {
-      await Tone.loaded();
-    }
 
     const now = Tone.now();
 
