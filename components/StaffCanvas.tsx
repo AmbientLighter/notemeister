@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Formatter, Renderer, Stave, StaveNote, Voice } from 'vexflow';
-import { ClefType, Note } from '../types';
+import type { ClefType, Note } from '../types';
 
 import { useTheme } from '../hooks/useTheme';
 

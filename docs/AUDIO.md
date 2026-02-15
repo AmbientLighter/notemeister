@@ -14,9 +14,9 @@ For each instrument (Piano, Guitar, Flute), we bundle a small set of "anchor" sa
 
 1.  **Pitch Shifting (Interpolation)**: `Tone.Sampler` uses these anchors to "fill in the gaps." To play a **D4**, it takes the **C4** sample and pitch-shifts it up automatically.
 2.  **Timbre Preservation**: Stretching a single sample over many octaves creates a "chipmunk" or "slow-mo" effect, making the instrument sound artificial. By providing anchors at the bottom, middle, and top of the primary practice range, we ensure no sample is stretched more than a few semitones, preserving the natural character (timbre) of the instrument.
-3.  **Efficiency & PWA Support**: 
-    *   **Bundle Size**: A full 88-key piano library would be dozens of megabytes. Our strategy uses ~500KB total for all instruments.
-    *   **Offline Functionality**: These few samples are precached by the Service Worker, allowing the app to work entirely offline without quality loss.
+3.  **Efficiency & PWA Support**:
+    - **Bundle Size**: A full 88-key piano library would be dozens of megabytes. Our strategy uses ~500KB total for all instruments.
+    - **Offline Functionality**: These few samples are precached by the Service Worker, allowing the app to work entirely offline without quality loss.
 
 ## Implementation Details
 

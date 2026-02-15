@@ -13,6 +13,13 @@ export interface Note {
   absoluteIndex: number; // calculated as octave * 7 + nameIndex
 }
 
+export interface NoteStat {
+  name: string;
+  avgTime: number;
+  accuracy: number;
+  count: number;
+}
+
 export interface GameSettings {
   clef: ClefType;
   // activeNotes stores specific notes like "C4", "D5", etc.

@@ -1,4 +1,4 @@
-import { Translations, Language } from './types';
+import type { Translations, Language, NoteName } from './types';
 
 export const TRANSLATIONS: Record<Language, Translations> = {
   en: {
@@ -48,15 +48,15 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     viewDeepMetrics: 'View Deep Metrics',
     focusOn: 'Focus on:',
     feedbackMastery: 'Absolute Mastery! Your precision is flawless.',
-    feedbackExemplary: 'Exemplary! You\'re becoming highly fluent.',
+    feedbackExemplary: "Exemplary! You're becoming highly fluent.",
     feedbackProgress: 'Great Progress! Keep honing that muscle memory.',
     feedbackGettingThere: 'Getting There! Focus on accuracy over speed.',
     feedbackKeepPracticing: 'Keep Practicing! Every session builds your skill.',
     quoteExpert: 'Expert performance! Your hard work is clearly paying off. 🎹',
-    quoteStrong: 'Strong progress! You\'re building a solid foundation. 🎵',
+    quoteStrong: "Strong progress! You're building a solid foundation. 🎵",
     quoteConsistency: 'Consistency is key. Keep playing and your fingers will find the way! ✨',
     reviewProgress: 'Review Progress',
-    backToOverview: 'Back to Overview'
+    backToOverview: 'Back to Overview',
   },
   ru: {
     title: 'Мастер Нот',
@@ -113,7 +113,7 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     quoteStrong: 'Сильный прогресс! Вы строите прочный фундамент. 🎵',
     quoteConsistency: 'Постоянство — залог успеха. Продолжайте играть! ✨',
     reviewProgress: 'Просмотр прогресса',
-    backToOverview: 'Вернуться к обзору'
+    backToOverview: 'Вернуться к обзору',
   },
   uk: {
     title: 'Майстер Нот',
@@ -163,14 +163,14 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     focusOn: 'Фокус на:',
     feedbackMastery: 'Абсолютна майстерність! Ваша точність бездоганна.',
     feedbackExemplary: 'Чудово! Ви стаєте дуже вільним.',
-    feedbackProgress: 'Відмінний прогрес! Продовжуйте відточувати пам\'ять.',
+    feedbackProgress: "Відмінний прогрес! Продовжуйте відточувати пам'ять.",
     feedbackGettingThere: 'Вже близько! Зосередьтеся на точності, а не на швидкості.',
     feedbackKeepPracticing: 'Продовжуйте практикуватися! Кожна сесія розвиває навичку.',
     quoteExpert: 'Майстерне виконання! Ваша робота приносить плоди. 🎹',
     quoteStrong: 'Сильний прогрес! Ви будуєте міцний фундамент. 🎵',
     quoteConsistency: 'Постійність — запорука успіху. Продовжуйте грати! ✨',
     reviewProgress: 'Переглянути прогрес',
-    backToOverview: 'Повернутися до огляду'
+    backToOverview: 'Повернутися до огляду',
   },
   et: {
     title: 'Noodimeister',
@@ -227,15 +227,15 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     quoteStrong: 'Tugev areng! Ehitad kindlat vundamenti. 🎵',
     quoteConsistency: 'Järjepidevus on võti. Jätka mängimist! ✨',
     reviewProgress: 'Vaata edenemist',
-    backToOverview: 'Tagasi ülevaatesse'
-  }
+    backToOverview: 'Tagasi ülevaatesse',
+  },
 };
 
-export const NOTE_NAMES: import('./types').NoteName[] = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+export const NOTE_NAMES: NoteName[] = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
 
 export const OCTAVE_RANGES = {
   treble: [3, 4, 5, 6],
-  bass: [1, 2, 3, 4]
+  bass: [1, 2, 3, 4],
 };
 
 export const SUPPORTED_LANGUAGES: Language[] = ['en', 'ru', 'uk', 'et'];

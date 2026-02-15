@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { NOTE_NAMES, OCTAVE_RANGES } from '../constants';
-import { ClefType, Note } from '../types';
+import type { ClefType, Note } from '../types';
 import { getNoteKey, getNoteVisualPosition, parseNoteKey } from '../utils/musicLogic';
 
 import { useTheme } from '../hooks/useTheme';
@@ -11,24 +11,20 @@ interface InteractiveStaffProps {
   onToggleNote: (noteKey: string) => void;
 }
 
-const InteractiveStaff: React.FC<InteractiveStaffProps> = ({
-  clef,
-  activeNotes,
-  onToggleNote,
-}) => {
+const InteractiveStaff: React.FC<InteractiveStaffProps> = ({ clef, activeNotes, onToggleNote }) => {
   const { darkMode } = useTheme();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [hoveredKey, setHoveredKey] = useState<string | null>(null);
+  const [hoveredKey, setHoveredKey] = useState<string | undefined>(undefined);
 
   // Determine which octaves are currently active
   const activeOctaves = useMemo(() => {
     const octs = new Set<number>();
-    activeNotes.forEach(key => {
+    for (const key of activeNotes) {
       // Parse "C4" -> 4
       const note = parseNoteKey(key);
       octs.add(note.octave);
-    });
+    }
     return octs;
   }, [activeNotes]);
 
@@ -44,7 +40,7 @@ const InteractiveStaff: React.FC<InteractiveStaffProps> = ({
 
     // If single octave selected, show just that one
     if (activeOctaves.size === 1) {
-      return [Array.from(activeOctaves)[0]];
+      return [[...activeOctaves][0]];
     }
 
     // Default fallback if nothing selected
@@ -56,15 +52,15 @@ const InteractiveStaff: React.FC<InteractiveStaffProps> = ({
   // Flatten octaves into displayable notes
   const displayNotes = useMemo(() => {
     const notes: Note[] = [];
-    displayOctaves.forEach(octave => {
-      NOTE_NAMES.forEach(name => {
+    for (const octave of displayOctaves) {
+      for (const name of NOTE_NAMES) {
         notes.push({
+          absoluteIndex: 0,
           name,
           octave,
-          absoluteIndex: 0
         });
-      });
-    });
+      }
+    }
     return notes;
   }, [displayOctaves]);
 
@@ -81,7 +77,7 @@ const InteractiveStaff: React.FC<InteractiveStaffProps> = ({
     const noteSpacing = 40;
     const paddingX = 40;
     const clefSpace = 60;
-    const totalWidth = clefSpace + (displayNotes.length * noteSpacing) + paddingX;
+    const totalWidth = clefSpace + displayNotes.length * noteSpacing + paddingX;
     const height = 180; // Fixed height
 
     // Resize Canvas
@@ -116,7 +112,7 @@ const InteractiveStaff: React.FC<InteractiveStaffProps> = ({
     ctx.lineCap = 'round';
 
     for (let i = 0; i < 5; i++) {
-      const y = staffTopY + (i * lineSpacing);
+      const y = staffTopY + i * lineSpacing;
       ctx.beginPath();
       ctx.moveTo(staffStartX, y);
       ctx.lineTo(staffEndX, y);
@@ -132,37 +128,39 @@ const InteractiveStaff: React.FC<InteractiveStaffProps> = ({
     const clefX = staffStartX + 30;
 
     if (clef === 'treble') {
-      ctx.fillText('𝄞', clefX, staffTopY + (3 * lineSpacing));
+      ctx.fillText('𝄞', clefX, staffTopY + 3 * lineSpacing);
     } else {
-      ctx.fillText('𝄢', clefX, staffTopY + (1 * lineSpacing));
+      ctx.fillText('𝄢', clefX, staffTopY + 1 * lineSpacing);
     }
 
     // Draw Notes
     displayNotes.forEach((note, index) => {
-      const x = staffStartX + clefSpace + (index * noteSpacing);
+      const x = staffStartX + clefSpace + index * noteSpacing;
       const key = getNoteKey(note);
       const isSelected = activeNotes.includes(key);
       const isHovered = hoveredKey === key;
 
       const stepsFromTop = getNoteVisualPosition(clef, note);
-      const y = staffTopY + (stepsFromTop * (lineSpacing / 2));
+      const y = staffTopY + stepsFromTop * (lineSpacing / 2);
 
       // Draw Ledger Lines
       const ledgerWidth = 24;
       ctx.strokeStyle = lineColor;
       ctx.lineWidth = 1;
 
-      if (stepsFromTop < 0) { // Above
+      if (stepsFromTop < 0) {
+        // Above
         for (let s = -2; s >= stepsFromTop; s -= 2) {
-          const ly = staffTopY + (s * (lineSpacing / 2));
+          const ly = staffTopY + s * (lineSpacing / 2);
           ctx.beginPath();
           ctx.moveTo(x - ledgerWidth / 2, ly);
           ctx.lineTo(x + ledgerWidth / 2, ly);
           ctx.stroke();
         }
-      } else if (stepsFromTop > 8) { // Below
+      } else if (stepsFromTop > 8) {
+        // Below
         for (let s = 10; s <= stepsFromTop; s += 2) {
-          const ly = staffTopY + (s * (lineSpacing / 2));
+          const ly = staffTopY + s * (lineSpacing / 2);
           ctx.beginPath();
           ctx.moveTo(x - ledgerWidth / 2, ly);
           ctx.lineTo(x + ledgerWidth / 2, ly);
@@ -186,7 +184,11 @@ const InteractiveStaff: React.FC<InteractiveStaffProps> = ({
       ctx.fill();
 
       // Label (Note Name + Octave)
-      ctx.fillStyle = isSelected ? (darkMode ? '#fff' : '#000') : (darkMode ? '#475569' : '#94a3b8');
+      if (isSelected) {
+        ctx.fillStyle = darkMode ? '#fff' : '#000';
+      } else {
+        ctx.fillStyle = darkMode ? '#475569' : '#94a3b8';
+      }
       ctx.font = `bold 12px sans-serif`;
       ctx.textAlign = 'center';
 
@@ -200,10 +202,9 @@ const InteractiveStaff: React.FC<InteractiveStaffProps> = ({
         ctx.fill();
       }
     });
-
   }, [clef, activeNotes, hoveredKey, darkMode, displayNotes]);
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const handleMouseMove = (e: React.MouseEvent): void => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
@@ -216,7 +217,7 @@ const InteractiveStaff: React.FC<InteractiveStaffProps> = ({
     const startOfNotes = staffStartX + clefSpace;
 
     if (x < startOfNotes - noteSpacing / 2) {
-      setHoveredKey(null);
+      setHoveredKey(undefined);
       return;
     }
 
@@ -225,15 +226,15 @@ const InteractiveStaff: React.FC<InteractiveStaffProps> = ({
     if (index >= 0 && index < displayNotes.length) {
       setHoveredKey(getNoteKey(displayNotes[index]));
     } else {
-      setHoveredKey(null);
+      setHoveredKey(undefined);
     }
   };
 
-  const handleMouseLeave = () => {
-    setHoveredKey(null);
+  const handleMouseLeave = (): void => {
+    setHoveredKey(undefined);
   };
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleClick = (_e: React.MouseEvent): void => {
     if (hoveredKey) {
       onToggleNote(hoveredKey);
     }
