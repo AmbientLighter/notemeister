@@ -9,7 +9,7 @@ export const useNoteMeister = () => {
     const [screen, setScreen] = useState<Screen>('setup');
 
     // 1. Theme Management
-    const { darkMode, toggleDarkMode } = useTheme();
+    const { darkMode } = useTheme();
 
     // 2. Settings Management
     const {
@@ -63,7 +63,6 @@ export const useNoteMeister = () => {
         setScreen,
         setSettings,
         setSortMethod,
-        toggleDarkMode,
         handleLanguageChange,
         handleClefChange,
         toggleOctaveGroup,

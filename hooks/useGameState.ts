@@ -44,7 +44,7 @@ export const useGameState = (settings: GameSettings, t: any) => {
         });
     }, [stats.history, sortMethod]);
 
-    const nextTurn = useCallback((firstTurn = false) => {
+    const nextTurn = useCallback(() => {
         const newNote = generateRandomNote(
             settings.activeNotes,
             currentNote || undefined
@@ -64,7 +64,7 @@ export const useGameState = (settings: GameSettings, t: any) => {
     const startGame = () => {
         audioEngine.init();
         setStats({ correct: 0, total: 0, streak: 0, history: [] });
-        nextTurn(true);
+        nextTurn();
     };
 
     const handleNoteSelect = (selectedName: NoteName) => {

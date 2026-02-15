@@ -14,10 +14,7 @@ export const useTheme = () => {
         return () => mediaQuery.removeEventListener('change', handleChange);
     }, []);
 
-    const toggleDarkMode = () => setDarkMode(prev => !prev);
-
     return {
-        darkMode,
-        toggleDarkMode
+        darkMode
     };
 };
