@@ -11,8 +11,7 @@ import StatsHeader from './StatsHeader';
 import FinishSessionButton from './FinishSessionButton';
 import FeedbackBubble from './FeedbackBubble';
 import { useTranslations } from '@/hooks/useTranslations';
-import { usePitchDetection } from '@/hooks/usePitchDetection';
-import { useMidi } from '@/hooks/useMidi';
+import { useInputManager } from '@/hooks/inputs/useInputManager';
 import MicStatusOverlay from './MicStatusOverlay';
 
 const GameScreen: React.FC = () => {
@@ -49,13 +48,11 @@ const GameScreen: React.FC = () => {
   const lastIncorrectNote = isScrolling ? scrollingLastIncorrectNote : standardLastIncorrectNote;
   const currentNote = isScrolling ? null : standardNote;
   const {
-    note: detectedNote,
     isActive: isMicActive,
     error: micError,
     startDetection,
-    stopDetection,
-    resetNote,
-  } = usePitchDetection();
+    detectedNote,
+  } = useInputManager(onNoteSelect, currentNote, isProcessing);
 
   // Session Recovery: If on game screen but no note (e.g. reload), start turn
   React.useEffect(() => {
@@ -64,7 +61,7 @@ const GameScreen: React.FC = () => {
     }
   }, [currentNote, nextTurn, settings.gameMode]);
 
-  const onNoteSelect = (name: NoteName) => {
+  function onNoteSelect(name: NoteName) {
     if (settings.gameMode === 'scrolling') {
       hitNote(name, {
         correctAnswer: t.correctAnswer,
@@ -76,47 +73,7 @@ const GameScreen: React.FC = () => {
         incorrectAnswer: t.incorrectAnswer,
       });
     }
-  };
-
-  // Auto-advance if detected note matches current note
-  React.useEffect(() => {
-    if (settings.inputMode === 'microphone' && isMicActive && !isProcessing && currentNote) {
-      const targetKey = `${currentNote.name}${currentNote.octave}`;
-      if (detectedNote === targetKey) {
-        resetNote();
-        onNoteSelect(currentNote.name);
-      }
-    }
-  }, [detectedNote, isMicActive, isProcessing, currentNote, settings.inputMode]);
-
-  // Handle clean up or auto-start (optional, usually needs user gesture)
-  React.useEffect(() => {
-    if (settings.inputMode !== 'microphone' && isMicActive) {
-      stopDetection();
-    }
-  }, [settings.inputMode, isMicActive, stopDetection]);
-
-  // Keyboard Input Support
-  React.useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (isProcessing || settings.inputMode !== 'keyboard') return;
-
-      const key = e.key.toUpperCase();
-      // Only handle A, B, C, D, E, F, G keys
-      if (/^[A-G]$/.test(key)) {
-        onNoteSelect(key as NoteName);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isProcessing, settings.inputMode, onNoteSelect]);
-
-  // MIDI Input Support
-  useMidi((name, _octave) => {
-    if (isProcessing) return;
-    onNoteSelect(name);
-  }, settings.inputMode === 'midi');
+  }
 
   return (
     <div className="flex flex-col h-full w-full sm:max-w-4xl sm:mx-auto items-center">

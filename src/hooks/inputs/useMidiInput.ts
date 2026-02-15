@@ -1,34 +1,26 @@
+/// <reference types="webmidi" />
 import { useEffect, useCallback } from 'react';
 import type { NoteName } from '@/types';
 
-interface MidiMessage {
-  command: number;
-  note: number;
-  velocity: number;
-}
-
 const MIDI_NOTE_NAMES: string[] = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
-export const useMidi = (onNoteOn: (name: NoteName, octave: number) => void, enabled: boolean) => {
+export const useMidiInput = (onNote: (note: NoteName) => void, enabled: boolean) => {
   const handleMidiMessage = useCallback(
     (event: WebMidi.MIDIMessageEvent) => {
       const [command, note, velocity] = event.data;
 
       // command 144 is Note On, command 128 is Note Off
-      // Some keyboards send Note On with velocity 0 instead of Note Off
       if (command === 144 && velocity > 0) {
-        const octave = Math.floor(note / 12) - 1;
         const nameIndex = note % 12;
         const name = MIDI_NOTE_NAMES[nameIndex];
 
         // Only trigger for natural notes that exist in our NoteName type
-        // This can be improved later to support accidentals if needed
         if (['C', 'D', 'E', 'F', 'G', 'A', 'B'].includes(name)) {
-          onNoteOn(name as NoteName, octave);
+          onNote(name as NoteName);
         }
       }
     },
-    [onNoteOn]
+    [onNote]
   );
 
   useEffect(() => {
