@@ -1,5 +1,5 @@
 import React from 'react';
-import { SUPPORTED_LANGUAGES, LANGUAGE_NAMES } from '@/constants';
+import { SUPPORTED_LANGUAGES, LANGUAGE_NAMES, LANGUAGE_FLAGS } from '@/constants';
 import { useTranslations } from '@/hooks/useTranslations';
 import Dropdown from '@/components/common/Dropdown';
 import type { Language } from '@/types';
@@ -10,6 +10,7 @@ const LanguagePicker: React.FC = () => {
   const options = SUPPORTED_LANGUAGES.map((lang) => ({
     id: lang,
     label: LANGUAGE_NAMES[lang],
+    icon: <span className="text-lg">{LANGUAGE_FLAGS[lang]}</span>,
   }));
 
   return (

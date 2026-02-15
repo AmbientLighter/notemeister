@@ -301,3 +301,10 @@ export const LANGUAGE_NAMES: Record<Language, string> = {
   uk: 'Українська',
   et: 'Eesti',
 };
+
+export const LANGUAGE_FLAGS: Record<Language, string> = {
+  en: '🇬🇧',
+  ru: '🇷🇺',
+  uk: '🇺🇦',
+  et: '🇪🇪',
+};

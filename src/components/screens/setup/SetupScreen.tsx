@@ -66,11 +66,11 @@ const SetupScreen: React.FC = () => {
 
         {showAdvanced && (
           <div className="mt-6 space-y-8 p-6 rounded-[2rem] bg-slate-50/50 dark:bg-slate-900/30 border border-slate-100 dark:border-slate-800 animate-in fade-in slide-in-from-top-2 duration-300">
+            <ThemeSelector />
             <LanguagePicker />
             <ClefSelector />
             <TempoSelector />
             <InputMethodSelector />
-            <ThemeSelector />
             <InstrumentSelector />
           </div>
         )}
