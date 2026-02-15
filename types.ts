@@ -4,6 +4,9 @@ export type NoteName = 'C' | 'D' | 'E' | 'F' | 'G' | 'A' | 'B';
 export type Tempo = 'slow' | 'normal' | 'fast';
 export type Instrument = 'silence' | 'piano' | 'guitar' | 'flute';
 
+export type Screen = 'setup' | 'game' | 'results';
+export type SortMethod = 'difficulty' | 'name' | 'time';
+
 export interface Note {
   name: NoteName;
   octave: number;
