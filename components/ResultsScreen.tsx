@@ -5,7 +5,6 @@ import { Check } from 'lucide-react';
 import HeatmapCanvas from './HeatmapCanvas';
 import DetailedStats from './DetailedStats';
 import SummaryGrid from './SummaryGrid';
-import FloatingNotes from './FloatingNotes';
 import { audioEngine } from '../utils/audio';
 
 const ResultsScreen: React.FC = () => {
@@ -74,9 +73,6 @@ const ResultsScreen: React.FC = () => {
 
     return (
         <>
-            {/* Animated Background Layers */}
-            <FloatingNotes />
-
             <div className="fixed inset-0 opacity-5 pointer-events-none z-0">
                 <div className="absolute top-1/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-indigo-900 dark:via-indigo-100 to-transparent"></div>
                 <div className="absolute top-2/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-indigo-900 dark:via-indigo-100 to-transparent"></div>
