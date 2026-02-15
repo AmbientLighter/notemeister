@@ -43,7 +43,20 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     instrumentPiano: 'Piano',
     instrumentGuitar: 'Guitar',
     instrumentFlute: 'Flute',
-    performanceAnalysis: 'Performance Analysis'
+    performanceAnalysis: 'Performance Analysis',
+    concealDetails: 'Conceal Details',
+    viewDeepMetrics: 'View Deep Metrics',
+    focusOn: 'Focus on:',
+    feedbackMastery: 'Absolute Mastery! Your precision is flawless.',
+    feedbackExemplary: 'Exemplary! You\'re becoming highly fluent.',
+    feedbackProgress: 'Great Progress! Keep honing that muscle memory.',
+    feedbackGettingThere: 'Getting There! Focus on accuracy over speed.',
+    feedbackKeepPracticing: 'Keep Practicing! Every session builds your skill.',
+    quoteExpert: 'Expert performance! Your hard work is clearly paying off. 🎹',
+    quoteStrong: 'Strong progress! You\'re building a solid foundation. 🎵',
+    quoteConsistency: 'Consistency is key. Keep playing and your fingers will find the way! ✨',
+    reviewProgress: 'Review Progress',
+    backToOverview: 'Back to Overview'
   },
   ru: {
     title: 'Мастер Нот',
@@ -87,7 +100,20 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     instrumentPiano: 'Пианино',
     instrumentGuitar: 'Гитара',
     instrumentFlute: 'Флейта',
-    performanceAnalysis: 'Анализ исполнения'
+    performanceAnalysis: 'Анализ исполнения',
+    concealDetails: 'Скрыть детали',
+    viewDeepMetrics: 'Глубокая аналитика',
+    focusOn: 'Фокус на:',
+    feedbackMastery: 'Абсолютное мастерство! Ваша точность безупречна.',
+    feedbackExemplary: 'Превосходно! Вы становитесь очень беглым.',
+    feedbackProgress: 'Отличный прогресс! Продолжайте оттачивать память.',
+    feedbackGettingThere: 'Уже близко! Сосредоточьтесь на точности, а не на скорости.',
+    feedbackKeepPracticing: 'Продолжайте практиковаться! Каждая сессия развивает навык.',
+    quoteExpert: 'Мастерское исполнение! Ваша работа приносит плоды. 🎹',
+    quoteStrong: 'Сильный прогресс! Вы строите прочный фундамент. 🎵',
+    quoteConsistency: 'Постоянство — залог успеха. Продолжайте играть! ✨',
+    reviewProgress: 'Просмотр прогресса',
+    backToOverview: 'Вернуться к обзору'
   },
   uk: {
     title: 'Майстер Нот',
@@ -131,7 +157,20 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     instrumentPiano: 'Піаніно',
     instrumentGuitar: 'Гітара',
     instrumentFlute: 'Флейта',
-    performanceAnalysis: 'Аналіз виконання'
+    performanceAnalysis: 'Аналіз виконання',
+    concealDetails: 'Приховати деталі',
+    viewDeepMetrics: 'Глибока аналітика',
+    focusOn: 'Фокус на:',
+    feedbackMastery: 'Абсолютна майстерність! Ваша точність бездоганна.',
+    feedbackExemplary: 'Чудово! Ви стаєте дуже вільним.',
+    feedbackProgress: 'Відмінний прогрес! Продовжуйте відточувати пам\'ять.',
+    feedbackGettingThere: 'Вже близько! Зосередьтеся на точності, а не на швидкості.',
+    feedbackKeepPracticing: 'Продовжуйте практикуватися! Кожна сесія розвиває навичку.',
+    quoteExpert: 'Майстерне виконання! Ваша робота приносить плоди. 🎹',
+    quoteStrong: 'Сильний прогрес! Ви будуєте міцний фундамент. 🎵',
+    quoteConsistency: 'Постійність — запорука успіху. Продовжуйте грати! ✨',
+    reviewProgress: 'Переглянути прогрес',
+    backToOverview: 'Повернутися до огляду'
   },
   et: {
     title: 'Noodimeister',
@@ -175,7 +214,20 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     instrumentPiano: 'Klaver',
     instrumentGuitar: 'Kitarr',
     instrumentFlute: 'Flööt',
-    performanceAnalysis: 'Tulemuslikkuse analüüs'
+    performanceAnalysis: 'Tulemuslikkuse analüüs',
+    concealDetails: 'Peida üksikasjad',
+    viewDeepMetrics: 'Vaata süvaanalüüsi',
+    focusOn: 'Keskendu:',
+    feedbackMastery: 'Täielik meisterlikkus! Sinu täpsus on veatu.',
+    feedbackExemplary: 'Eeskujulik! Muutud väga sujuvaks.',
+    feedbackProgress: 'Suurepärane areng! Jätka harjutamist.',
+    feedbackGettingThere: 'Juba peaaegu! Keskendu täpsusele, mitte kiirusele.',
+    feedbackKeepPracticing: 'Jätka harjutamist! Iga seanss arendab oskusi.',
+    quoteExpert: 'Meisterlik sooritus! Sinu töö kannab vilja. 🎹',
+    quoteStrong: 'Tugev areng! Ehitad kindlat vundamenti. 🎵',
+    quoteConsistency: 'Järjepidevus on võti. Jätka mängimist! ✨',
+    reviewProgress: 'Vaata edenemist',
+    backToOverview: 'Tagasi ülevaatesse'
   }
 };
 

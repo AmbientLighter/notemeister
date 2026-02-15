@@ -78,4 +78,17 @@ export interface Translations {
   instrumentGuitar: string;
   instrumentFlute: string;
   performanceAnalysis: string;
+  concealDetails: string;
+  viewDeepMetrics: string;
+  focusOn: string;
+  feedbackMastery: string;
+  feedbackExemplary: string;
+  feedbackProgress: string;
+  feedbackGettingThere: string;
+  feedbackKeepPracticing: string;
+  quoteExpert: string;
+  quoteStrong: string;
+  quoteConsistency: string;
+  reviewProgress: string;
+  backToOverview: string;
 }
