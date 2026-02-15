@@ -7,6 +7,8 @@ import Keyboard from './Keyboard';
 import StatsHeader from './StatsHeader';
 import FinishSessionButton from './FinishSessionButton';
 import { useTranslations } from '../hooks/useTranslations';
+import { usePitchDetection } from '../hooks/usePitchDetection';
+import MicStatusOverlay from './MicStatusOverlay';
 
 const GameScreen: React.FC = () => {
   const { t } = useTranslations();
@@ -21,6 +23,22 @@ const GameScreen: React.FC = () => {
   const lastCorrectNote = useSessionStore((state) => state.lastCorrectNote);
   const lastIncorrectNote = useSessionStore((state) => state.lastIncorrectNote);
   const handleNoteSelect = useSessionStore((state) => state.handleNoteSelect);
+  const nextTurn = useSessionStore((state) => state.nextTurn);
+  const {
+    note: detectedNote,
+    isActive: isMicActive,
+    error: micError,
+    startDetection,
+    stopDetection,
+    resetNote,
+  } = usePitchDetection();
+
+  // Session Recovery: If on game screen but no note (e.g. reload), start turn
+  React.useEffect(() => {
+    if (!currentNote) {
+      nextTurn();
+    }
+  }, [currentNote, nextTurn]);
 
   const onNoteSelect = (name: NoteName) => {
     handleNoteSelect(name, {
@@ -28,6 +46,24 @@ const GameScreen: React.FC = () => {
       incorrectAnswer: t.incorrectAnswer,
     });
   };
+
+  // Auto-advance if detected note matches current note
+  React.useEffect(() => {
+    if (settings.instrument === 'microphone' && isMicActive && !isProcessing && currentNote) {
+      const targetKey = `${currentNote.name}${currentNote.octave}`;
+      if (detectedNote === targetKey) {
+        resetNote();
+        onNoteSelect(currentNote.name);
+      }
+    }
+  }, [detectedNote, isMicActive, isProcessing, currentNote, settings.instrument]);
+
+  // Handle clean up or auto-start (optional, usually needs user gesture)
+  React.useEffect(() => {
+    if (settings.instrument !== 'microphone' && isMicActive) {
+      stopDetection();
+    }
+  }, [settings.instrument, isMicActive, stopDetection]);
   return (
     <div className="flex flex-col h-full w-full sm:max-w-4xl sm:mx-auto items-center">
       <StatsHeader />
@@ -51,21 +87,36 @@ const GameScreen: React.FC = () => {
           )}
         </div>
 
-        {/* Canvas */}
         <div className="w-full max-w-3xl aspect-[3/2] sm:aspect-[2/1] md:aspect-[2.5/1] relative">
           <StaffCanvas clef={settings.clef} note={currentNote} className="w-full h-full" />
+
+          {/* Microphone Status Overlay */}
+          {settings.instrument === 'microphone' && (
+            <MicStatusOverlay
+              isActive={isMicActive}
+              detectedNote={detectedNote}
+              error={micError}
+              onActivate={startDetection}
+            />
+          )}
         </div>
 
         {/* Question Text */}
-        <p className="text-slate-400 dark:text-slate-500 font-medium text-lg">{t.question}</p>
+        <p className="text-slate-400 dark:text-slate-500 font-medium text-lg">
+          {settings.instrument === 'microphone' && isMicActive && currentNote
+            ? t.playThisNote
+            : t.question}
+        </p>
 
         {/* Keyboard */}
-        <Keyboard
-          onNoteSelect={onNoteSelect}
-          disabled={isProcessing}
-          lastCorrectNote={lastCorrectNote}
-          lastIncorrectNote={lastIncorrectNote}
-        />
+        {settings.instrument !== 'microphone' && (
+          <Keyboard
+            onNoteSelect={onNoteSelect}
+            disabled={isProcessing}
+            lastCorrectNote={lastCorrectNote}
+            lastIncorrectNote={lastIncorrectNote}
+          />
+        )}
       </div>
 
       {/* Mobile Finish Button */}

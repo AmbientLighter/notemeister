@@ -142,6 +142,18 @@ export const useGameStore = create<GameState>()(
     }),
     {
       name: 'note-meister-storage',
+      version: 1,
+      // Custom merge to ensure settings object is merged deeply (preserving instrument if missing in old storage)
+      merge: (persistedState: any, currentState) => {
+        return {
+          ...currentState,
+          ...persistedState,
+          settings: {
+            ...currentState.settings,
+            ...(persistedState?.settings || {}),
+          },
+        };
+      },
       partialize: (state) => ({
         screen: state.screen,
         settings: state.settings,

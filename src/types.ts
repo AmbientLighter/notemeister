@@ -2,7 +2,7 @@ export type Language = 'en' | 'ru' | 'uk' | 'et';
 export type ClefType = 'treble' | 'bass';
 export type NoteName = 'C' | 'D' | 'E' | 'F' | 'G' | 'A' | 'B';
 export type Tempo = 'slow' | 'normal' | 'fast';
-export type Instrument = 'silence' | 'piano' | 'guitar' | 'flute';
+export type Instrument = 'silence' | 'piano' | 'guitar' | 'flute' | 'microphone';
 
 export type Screen = 'setup' | 'game' | 'results';
 export type SortMethod = 'difficulty' | 'name' | 'time';
@@ -84,6 +84,8 @@ export interface Translations {
   instrumentPiano: string;
   instrumentGuitar: string;
   instrumentFlute: string;
+  instrumentMicrophone: string;
+  micAccessRequired: string;
   performanceAnalysis: string;
   concealDetails: string;
   viewDeepMetrics: string;
@@ -98,4 +100,6 @@ export interface Translations {
   quoteConsistency: string;
   reviewProgress: string;
   backToOverview: string;
+  playOrSing: string;
+  playThisNote: string;
 }

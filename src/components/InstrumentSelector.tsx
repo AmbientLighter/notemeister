@@ -9,10 +9,11 @@ const InstrumentSelector: React.FC = () => {
   const updateSettings = useGameStore((state) => state.updateSettings);
 
   const instruments = [
-    { id: 'silence', label: t.instrumentSilence, icon: '🔇' },
     { id: 'piano', label: t.instrumentPiano, icon: '🎹' },
     { id: 'guitar', label: t.instrumentGuitar, icon: '🎸' },
     { id: 'flute', label: t.instrumentFlute, icon: '🎷' },
+    { id: 'microphone', label: t.instrumentMicrophone, icon: '🎤' },
+    { id: 'silence', label: t.instrumentSilence, icon: '🔇' },
   ] as { id: Instrument; label: string; icon: string }[];
 
   return (
