@@ -8,6 +8,7 @@ import StatsHeader from './StatsHeader';
 import FinishSessionButton from './FinishSessionButton';
 import { useTranslations } from '@/hooks/useTranslations';
 import { usePitchDetection } from '@/hooks/usePitchDetection';
+import { useMidi } from '@/hooks/useMidi';
 import MicStatusOverlay from './MicStatusOverlay';
 
 const GameScreen: React.FC = () => {
@@ -80,6 +81,12 @@ const GameScreen: React.FC = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isProcessing, settings.instrument, onNoteSelect]);
+
+  // MIDI Input Support
+  useMidi((name, octave) => {
+    if (isProcessing) return;
+    onNoteSelect(name);
+  });
   return (
     <div className="flex flex-col h-full w-full sm:max-w-4xl sm:mx-auto items-center">
       <StatsHeader />
