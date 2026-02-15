@@ -294,3 +294,10 @@ export const OCTAVE_RANGES = {
 };
 
 export const SUPPORTED_LANGUAGES: Language[] = ['en', 'ru', 'uk', 'et'];
+
+export const LANGUAGE_NAMES: Record<Language, string> = {
+  en: 'English',
+  ru: 'Русский',
+  uk: 'Українська',
+  et: 'Eesti',
+};
