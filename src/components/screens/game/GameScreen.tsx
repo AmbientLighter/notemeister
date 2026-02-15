@@ -3,7 +3,7 @@ import type { NoteName } from '@/types';
 import { useGameStore } from '@/store/useGameStore';
 import { useSessionStore } from '@/store/useSessionStore';
 import { useScrollingMode } from '@/hooks/useScrollingMode';
-import { Play } from 'lucide-react';
+import PauseButton from './PauseButton';
 import StaffCanvas from './StaffCanvas';
 import ScrollingStaffCanvas from './ScrollingStaffCanvas';
 import Keyboard from './Keyboard';
@@ -129,24 +129,7 @@ const GameScreen: React.FC = () => {
 
           {settings.gameMode === 'scrolling' && (
             <div className="flex gap-2">
-              <button
-                onClick={() => setPaused(!isPaused)}
-                className={`px-4 py-2 rounded-full font-bold transition-all transform active:scale-95 flex items-center gap-2 ${
-                  isPaused
-                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200'
-                    : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
-                }`}
-              >
-                {isPaused ? (
-                  <Play className="w-4 h-4 fill-current" />
-                ) : (
-                  <div className="w-4 h-4 flex gap-1 justify-center items-center">
-                    <div className="w-1 h-3 bg-current rounded-full" />
-                    <div className="w-1 h-3 bg-current rounded-full" />
-                  </div>
-                )}
-                {isPaused ? t.resume : t.pause}
-              </button>
+              <PauseButton isPaused={isPaused} onToggle={() => setPaused(!isPaused)} />
 
               {isPaused && (
                 <FinishSessionButton className="px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-full font-bold shadow-lg shadow-rose-200 active:scale-95 transition-all flex items-center gap-2" />
