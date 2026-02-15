@@ -248,7 +248,7 @@ const InteractiveStaff: React.FC<InteractiveStaffProps> = ({
       >
         <canvas
           ref={canvasRef}
-          className="cursor-pointer bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 flex-shrink-0"
+          className="cursor-pointer flex-shrink-0"
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
           onClick={handleClick}

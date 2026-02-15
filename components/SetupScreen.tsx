@@ -29,13 +29,11 @@ const SetupScreen: React.FC = () => {
             {/* Interactive Staff Selection */}
             <div className="mb-10">
                 <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-4 uppercase tracking-widest">{t.selectNotes}</label>
-                <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-3xl border border-slate-100 dark:border-slate-700/50 shadow-inner">
-                    <InteractiveStaff
-                        clef={settings.clef}
-                        activeNotes={settings.activeNotes}
-                        onToggleNote={toggleSingleNote}
-                    />
-                </div>
+                <InteractiveStaff
+                    clef={settings.clef}
+                    activeNotes={settings.activeNotes}
+                    onToggleNote={toggleSingleNote}
+                />
                 {settings.activeNotes.length === 0 && (
                     <p className="text-red-500 text-xs font-bold mt-4 text-center animate-bounce uppercase tracking-tighter">
                         {t.noNotesSelected}

@@ -54,12 +54,12 @@ const ResultsScreen: React.FC = () => {
     }, [stats.history, noteStats]);
 
     const feedbackText = React.useMemo(() => {
-        if (overallAccuracy >= 95) return "Absolute Mastery! Your precision is flawless.";
-        if (overallAccuracy >= 85) return "Exemplary! You're becoming highly fluent.";
-        if (overallAccuracy >= 70) return "Great Progress! Keep honing that muscle memory.";
-        if (overallAccuracy >= 50) return "Getting There! Focus on accuracy over speed.";
-        return "Keep Practicing! Every session builds your skill.";
-    }, [overallAccuracy]);
+        if (overallAccuracy >= 95) return t.feedbackMastery;
+        if (overallAccuracy >= 85) return t.feedbackExemplary;
+        if (overallAccuracy >= 70) return t.feedbackProgress;
+        if (overallAccuracy >= 50) return t.feedbackGettingThere;
+        return t.feedbackKeepPracticing;
+    }, [overallAccuracy, t]);
 
     return (
         <>
@@ -97,7 +97,7 @@ const ResultsScreen: React.FC = () => {
                     </p>
                     {weakestNotes.length > 0 && (
                         <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
-                            Focus on: <span className="font-mono bg-indigo-50 dark:bg-slate-900/50 px-2 py-0.5 rounded border border-indigo-100 dark:border-slate-700">{weakestNotes.join(', ')}</span>
+                            {t.focusOn} <span className="font-mono bg-indigo-50 dark:bg-slate-900/50 px-2 py-0.5 rounded border border-indigo-100 dark:border-slate-700">{weakestNotes.join(', ')}</span>
                         </p>
                     )}
                 </div>
@@ -122,7 +122,7 @@ const ResultsScreen: React.FC = () => {
                         onClick={() => setShowDetails(!showDetails)}
                         className="bg-white/50 dark:bg-slate-700/50 backdrop-blur-sm text-indigo-800 dark:text-indigo-200 py-5 px-8 rounded-2xl font-bold border-2 border-white/80 dark:border-slate-600/50 hover:bg-white/80 dark:hover:bg-slate-600 transition-all text-lg shadow-lg"
                     >
-                        {showDetails ? 'Back to Overview' : 'Review Progress'}
+                        {showDetails ? t.backToOverview : t.reviewProgress}
                     </button>
                 </div>
 
@@ -144,10 +144,10 @@ const ResultsScreen: React.FC = () => {
                 <div className={`mt-12 text-center transition-all duration-1000 delay-[1200ms] ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
                     <p className="text-slate-500 dark:text-slate-400 text-sm font-medium italic">
                         {overallAccuracy >= 90
-                            ? "Expert performance! Your hard work is clearly paying off. 🎹"
+                            ? t.quoteExpert
                             : overallAccuracy >= 70
-                                ? "Strong progress! You're building a solid foundation. 🎵"
-                                : "Consistency is key. Keep playing and your fingers will find the way! ✨"}
+                                ? t.quoteStrong
+                                : t.quoteConsistency}
                     </p>
                 </div>
             </div>
