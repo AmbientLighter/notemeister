@@ -20,7 +20,9 @@ This README explains how to run, build and contribute to the project, describes 
 ## Features
 
 - Interactive staff display with clickable notes and canvas rendering
+- Musical instruments (Piano, Guitar, Flute) using Tone.js (see [Audio Strategy](docs/AUDIO.md))
 - Lightweight, dependency-minimal front-end using Vite + React + TypeScript
+- Offline support via PWA integration
 
 ## Tech stack
 
