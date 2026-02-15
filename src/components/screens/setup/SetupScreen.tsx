@@ -2,12 +2,14 @@ import React from 'react';
 import { useTranslations } from '@/hooks/useTranslations';
 import { useGameStore } from '@/store/useGameStore';
 import { useSessionStore } from '@/store/useSessionStore';
+import { useScrollingStore } from '@/store/useScrollingStore';
 import ClefSelector from './ClefSelector';
 import InstrumentSelector from './InstrumentSelector';
 import InteractiveStaff from './InteractiveStaff';
 import LanguagePicker from './LanguagePicker';
 import OctaveSelector from './OctaveSelector';
 import TempoSelector from './TempoSelector';
+import ModeSelector from './ModeSelector';
 import InputMethodSelector from './InputMethodSelector';
 import ThemeSelector from './ThemeSelector';
 import { ChevronDown, ChevronUp, Settings2 } from 'lucide-react';
@@ -16,7 +18,11 @@ const SetupScreen: React.FC = () => {
   const { t } = useTranslations();
   const settings = useGameStore((state) => state.settings);
   const toggleSingleNote = useGameStore((state) => state.toggleSingleNote);
-  const startGame = useSessionStore((state) => state.startGame);
+  const startStandardGame = useSessionStore((state) => state.startGame);
+  const startScrollingGame = useScrollingStore((state) => state.startGame);
+
+  const startGame = settings.gameMode === 'scrolling' ? startScrollingGame : startStandardGame;
+
   const [showAdvanced, setShowAdvanced] = React.useState(false);
 
   return (
@@ -68,6 +74,7 @@ const SetupScreen: React.FC = () => {
           <div className="mt-6 space-y-8 p-6 rounded-[2rem] bg-slate-50/50 dark:bg-slate-900/30 border border-slate-100 dark:border-slate-800 animate-in fade-in slide-in-from-top-2 duration-300">
             <ThemeSelector />
             <LanguagePicker />
+            <ModeSelector />
             <ClefSelector />
             <TempoSelector />
             <InputMethodSelector />

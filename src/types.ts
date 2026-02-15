@@ -8,6 +8,14 @@ export type AppTheme = 'light' | 'dark' | 'system';
 
 export type Screen = 'setup' | 'game' | 'results';
 export type SortMethod = 'difficulty' | 'name' | 'time';
+export type GameMode = 'standard' | 'scrolling';
+
+export interface ScrollingNote {
+  id: string;
+  note: Note;
+  x: number; // 0 to 100 representing percentage from right to left
+  spawnedAt: number;
+}
 
 export interface Note {
   name: NoteName;
@@ -29,6 +37,7 @@ export interface GameSettings {
   tempo: Tempo;
   instrument: Instrument;
   inputMode: InputMode;
+  gameMode: GameMode;
 }
 
 export interface GameStats {
@@ -114,4 +123,8 @@ export interface Translations {
   themeLight: string;
   themeDark: string;
   themeSystem: string;
+  gameMode: string;
+  modeStandard: string;
+  modeScrolling: string;
+  missed: string;
 }

@@ -73,6 +73,10 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     themeLight: 'Light',
     themeDark: 'Dark',
     themeSystem: 'System',
+    gameMode: 'Game Mode',
+    modeStandard: 'Classic',
+    modeScrolling: 'Scrolling Staff',
+    missed: 'Missed',
   },
   ru: {
     title: 'Мастер Нот',
@@ -143,6 +147,10 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     themeLight: 'Светлое',
     themeDark: 'Темное',
     themeSystem: 'Системное',
+    gameMode: 'Режим игры',
+    modeStandard: 'Классика',
+    modeScrolling: 'Бегущий стан',
+    missed: 'Пропущено',
   },
   uk: {
     title: 'Майстер Нот',
@@ -213,6 +221,10 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     themeLight: 'Світле',
     themeDark: 'Темне',
     themeSystem: 'Системне',
+    gameMode: 'Режим гри',
+    modeStandard: 'Класика',
+    modeScrolling: 'Біжучий стан',
+    missed: 'Пропущено',
   },
   et: {
     title: 'Noodimeister',
@@ -283,6 +295,10 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     themeLight: 'Hele',
     themeDark: 'Tume',
     themeSystem: 'Süsteemne',
+    gameMode: 'Mängurežiim',
+    modeStandard: 'Klassikaline',
+    modeScrolling: 'Jooksev noodijoonestik',
+    missed: 'Vahele jäänud',
   },
 };
 

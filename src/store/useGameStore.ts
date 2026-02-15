@@ -29,6 +29,7 @@ const DEFAULT_SETTINGS: GameSettings = {
   tempo: 'normal',
   instrument: 'piano',
   inputMode: 'keyboard',
+  gameMode: 'standard',
 };
 
 export const useGameStore = create<GameState>()(
