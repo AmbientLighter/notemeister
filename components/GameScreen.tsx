@@ -71,7 +71,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
                 </div>
 
                 {/* Canvas */}
-                <div className="w-full max-w-2xl aspect-[2/1] md:aspect-[2.5/1] relative">
+                <div className="w-full max-w-3xl aspect-[3/2] sm:aspect-[2/1] md:aspect-[2.5/1] relative">
                     <StaffCanvas
                         clef={settings.clef}
                         note={currentNote}

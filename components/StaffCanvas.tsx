@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
+import { Renderer, Stave, StaveNote, Voice, Formatter } from 'vexflow';
 import { ClefType, Note } from '../types';
-import { getNoteVisualPosition } from '../utils/musicLogic';
 
 interface StaffCanvasProps {
   clef: ClefType;
@@ -10,160 +10,80 @@ interface StaffCanvasProps {
 }
 
 const StaffCanvas: React.FC<StaffCanvasProps> = ({ clef, note, darkMode = false, className }) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!containerRef.current) return;
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    const container = containerRef.current;
 
-    // Responsive sizing
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    
-    // Set actual size in memory (scaled to account for extra pixel density)
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
+    // Clear previous rendering
+    while (container.firstChild) {
+      container.removeChild(container.firstChild);
+    }
 
-    // Normalize coordinate system to use CSS pixels.
-    ctx.scale(dpr, dpr);
-    
-    const width = rect.width;
-    const height = rect.height;
+    const renderer = new Renderer(container, Renderer.Backends.SVG);
 
-    // --- Colors ---
-    const lineColor = darkMode ? '#94a3b8' : '#1e293b'; // slate-400 : slate-800
+    // Size the renderer
+    const width = container.clientWidth || 400;
+    const height = container.clientHeight || 200;
+    renderer.resize(width, height);
+
+    const context = renderer.getContext();
+
+    // Setup scaling for "Maximal" display
+    // We'll scale everything up to fill the container better
+    const scale = 3;
+    context.scale(scale, scale);
+
+    // Setup colors based on dark mode
     const noteColor = darkMode ? '#f8fafc' : '#0f172a'; // slate-50 : slate-900
+    const staveLineColor = darkMode ? '#94a3b8' : '#334155'; // slate-400 : slate-700
 
-    // --- Drawing Logic ---
-    
-    // Clear
-    ctx.clearRect(0, 0, width, height);
+    context.setFillStyle(noteColor);
+    context.setStrokeStyle(staveLineColor);
 
-    // Configuration
-    const staffHeight = height * 0.4;
-    const staffTopY = (height - staffHeight) / 2;
-    const lineSpacing = staffHeight / 4;
-    const staffStartX = width * 0.1;
-    const staffEndX = width * 0.9;
-    
-    // Draw Staff Lines
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = lineColor;
-    ctx.lineCap = 'round';
+    // Create stave
+    // Adjust width and positioning to account for scale
+    const scaledWidth = width / scale;
+    const scaledHeight = height / scale;
 
-    for (let i = 0; i < 5; i++) {
-      const y = staffTopY + (i * lineSpacing);
-      ctx.beginPath();
-      ctx.moveTo(staffStartX, y);
-      ctx.lineTo(staffEndX, y);
-      ctx.stroke();
-    }
+    const staveWidth = scaledWidth * 0.9;
+    const staveX = (scaledWidth - staveWidth) / 2;
+    const staveY = (scaledHeight - 100) / 2;
 
-    // Draw End Bars
-    ctx.beginPath();
-    ctx.moveTo(staffStartX, staffTopY);
-    ctx.lineTo(staffStartX, staffTopY + staffHeight);
-    ctx.stroke();
+    const stave = new Stave(staveX, staveY, staveWidth);
+    stave.addClef(clef);
+    stave.setContext(context).draw();
 
-    ctx.beginPath();
-    ctx.moveTo(staffEndX, staffTopY);
-    ctx.lineTo(staffEndX, staffTopY + staffHeight);
-    ctx.stroke();
-
-    // Draw Clef
-    ctx.fillStyle = noteColor;
-    const fontSize = staffHeight * 1.5;
-    ctx.font = `${fontSize}px serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    
-    // Adjust clef position manually to align with lines
-    const clefX = staffStartX + 40;
-    
-    if (clef === 'treble') {
-       // Treble clef roughly centers on G4 (2nd line from bottom)
-       // Visual adjustment to make the spiral sit on the line
-       ctx.fillText('𝄞', clefX, staffTopY + (3 * lineSpacing)); 
-    } else {
-       // Bass clef dots surround F3 (2nd line from top)
-       // Visual adjustment
-       ctx.fillText('𝄢', clefX, staffTopY + (1 * lineSpacing)); 
-    }
-
-    // Draw Note
     if (note) {
-      const stepsFromTop = getNoteVisualPosition(clef, note);
-      const noteY = staffTopY + (stepsFromTop * (lineSpacing / 2));
-      const noteX = width / 2;
-      
-      // Draw Ledger Lines
-      // Check if note is above top line (stepsFromTop < 0) or below bottom line (stepsFromTop > 8)
-      // Steps: 0=TopLine, 2=Space, 4=MidLine... 8=BottomLine
-      
-      const ledgerWidth = 30;
-      
-      if (stepsFromTop < 0) {
-        // Above staff
-        // Ledger lines occur at -2, -4, -6...
-        for (let s = -2; s >= stepsFromTop; s -= 2) {
-          const ly = staffTopY + (s * (lineSpacing / 2));
-          ctx.beginPath();
-          ctx.moveTo(noteX - ledgerWidth/2, ly);
-          ctx.lineTo(noteX + ledgerWidth/2, ly);
-          ctx.stroke();
-        }
-      } else if (stepsFromTop > 8) {
-        // Below staff
-        // Ledger lines occur at 10, 12, 14...
-        for (let s = 10; s <= stepsFromTop; s += 2) {
-          const ly = staffTopY + (s * (lineSpacing / 2));
-          ctx.beginPath();
-          ctx.moveTo(noteX - ledgerWidth/2, ly);
-          ctx.lineTo(noteX + ledgerWidth/2, ly);
-          ctx.stroke();
-        }
-      }
+      // Create a stave note
+      const vexNote = new StaveNote({
+        clef: clef,
+        keys: [`${note.name}/${note.octave}`],
+        duration: 'q',
+      });
 
-      // Note Head
-      ctx.beginPath();
-      // Ellipse rotation for style
-      const radiusX = lineSpacing * 0.65;
-      const radiusY = lineSpacing * 0.5;
-      ctx.ellipse(noteX, noteY, radiusX, radiusY, -0.2, 0, 2 * Math.PI);
-      ctx.fill();
+      // Apply styling to the note
+      vexNote.setStyle({ fillStyle: noteColor, strokeStyle: noteColor });
 
-      // Stem
-      // Rules: If note is below middle line (steps > 4), stem goes UP from right side.
-      // If note is on or above middle line (steps <= 4), stem goes DOWN from left side.
-      ctx.lineWidth = 1.5;
-      const stemHeight = lineSpacing * 3.5;
-      
-      if (stepsFromTop > 4) {
-        // Stem Up
-        ctx.beginPath();
-        const stemX = noteX + radiusX - 1; 
-        ctx.moveTo(stemX, noteY);
-        ctx.lineTo(stemX, noteY - stemHeight);
-        ctx.stroke();
-      } else {
-        // Stem Down
-        ctx.beginPath();
-        const stemX = noteX - radiusX + 1;
-        ctx.moveTo(stemX, noteY);
-        ctx.lineTo(stemX, noteY + stemHeight);
-        ctx.stroke();
-      }
+      // Create a voice and add the notes
+      const voice = new Voice({ numBeats: 1, beatValue: 4 });
+      voice.setStrict(false);
+      voice.addTickables([vexNote]);
+
+      // Format and justify the notes to the stave width
+      new Formatter().joinVoices([voice]).format([voice], staveWidth);
+
+      // Render voice
+      voice.draw(context, stave);
     }
-
   }, [clef, note, darkMode]);
 
   return (
-    <canvas 
-      ref={canvasRef} 
-      className={`w-full h-full bg-white dark:bg-slate-800 rounded-xl shadow-inner border border-slate-200 dark:border-slate-700 transition-colors duration-200 ${className}`}
+    <div
+      ref={containerRef}
+      className={`w-full h-full bg-white dark:bg-slate-800 rounded-xl shadow-inner border border-slate-200 dark:border-slate-700 transition-colors duration-200 overflow-hidden flex items-center justify-center ${className}`}
     />
   );
 };
