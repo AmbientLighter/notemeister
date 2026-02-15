@@ -69,6 +69,8 @@ const App: React.FC = () => {
             noteStats={noteStats}
             sortMethod={sortMethod}
             t={t}
+            clef={settings.clef}
+            darkMode={darkMode}
             setSortMethod={setSortMethod}
             setScreen={setScreen}
           />

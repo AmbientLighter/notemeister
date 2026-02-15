@@ -1,11 +1,14 @@
 import React from 'react';
 import { GameStats, SortMethod, Screen } from '../types';
+import HeatmapCanvas from './HeatmapCanvas';
 
 interface ResultsScreenProps {
     stats: GameStats;
     noteStats: any[];
     sortMethod: SortMethod;
     t: any;
+    clef: 'treble' | 'bass';
+    darkMode: boolean;
     setSortMethod: (method: SortMethod) => void;
     setScreen: (screen: Screen) => void;
 }
@@ -15,6 +18,8 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
     noteStats,
     sortMethod,
     t,
+    clef,
+    darkMode,
     setSortMethod,
     setScreen
 }) => {
@@ -46,6 +51,16 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
                     <div className="text-3xl font-bold text-slate-600 dark:text-slate-300">{(avgTime / 1000).toFixed(1)}s</div>
                     <div className="text-xs text-slate-400 dark:text-slate-500 font-bold uppercase mt-1">{t.avgTime}</div>
                 </div>
+            </div>
+
+            {/* Visual Heatmap */}
+            <div className="mb-8">
+                <h3 className="font-bold text-slate-700 dark:text-slate-300 mb-4 text-left font-mono uppercase text-xs tracking-wider">{t.performanceAnalysis || 'Performance Heatmap'}</h3>
+                <HeatmapCanvas
+                    noteStats={noteStats}
+                    clef={clef}
+                    darkMode={darkMode}
+                />
             </div>
 
             {/* Detailed Stats */}
