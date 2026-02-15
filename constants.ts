@@ -37,7 +37,12 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     sortBy: 'Sort by',
     sortDifficulty: 'Difficulty',
     sortName: 'Name',
-    sortTime: 'Time'
+    sortTime: 'Time',
+    selectInstrument: 'Select Instrument',
+    instrumentSilence: 'Silence',
+    instrumentPiano: 'Piano',
+    instrumentGuitar: 'Guitar',
+    instrumentFlute: 'Flute'
   },
   ru: {
     title: 'Мастер Нот',
@@ -75,7 +80,12 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     sortBy: 'Сортировка',
     sortDifficulty: 'Сложность',
     sortName: 'Имя',
-    sortTime: 'Время'
+    sortTime: 'Время',
+    selectInstrument: 'Инструмент',
+    instrumentSilence: 'Без звука',
+    instrumentPiano: 'Пианино',
+    instrumentGuitar: 'Гитара',
+    instrumentFlute: 'Флейта'
   },
   uk: {
     title: 'Майстер Нот',
@@ -113,7 +123,12 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     sortBy: 'Сортувати',
     sortDifficulty: 'Складність',
     sortName: 'Назва',
-    sortTime: 'Час'
+    sortTime: 'Час',
+    selectInstrument: 'Інструмент',
+    instrumentSilence: 'Без звуку',
+    instrumentPiano: 'Піаніно',
+    instrumentGuitar: 'Гітара',
+    instrumentFlute: 'Флейта'
   },
   et: {
     title: 'Noodimeister',
@@ -151,7 +166,12 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     sortBy: 'Sorteeri',
     sortDifficulty: 'Raskus',
     sortName: 'Nimi',
-    sortTime: 'Aeg'
+    sortTime: 'Aeg',
+    selectInstrument: 'Vali instrument',
+    instrumentSilence: 'Vaikus',
+    instrumentPiano: 'Klaver',
+    instrumentGuitar: 'Kitarr',
+    instrumentFlute: 'Flööt'
   }
 };
 

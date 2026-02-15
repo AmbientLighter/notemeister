@@ -2,6 +2,7 @@ export type Language = 'en' | 'ru' | 'uk' | 'et';
 export type ClefType = 'treble' | 'bass';
 export type NoteName = 'C' | 'D' | 'E' | 'F' | 'G' | 'A' | 'B';
 export type Tempo = 'slow' | 'normal' | 'fast';
+export type Instrument = 'silence' | 'piano' | 'guitar' | 'flute';
 
 export interface Note {
   name: NoteName;
@@ -13,8 +14,9 @@ export interface GameSettings {
   language: Language;
   clef: ClefType;
   // activeNotes stores specific notes like "C4", "D5", etc.
-  activeNotes: string[]; 
+  activeNotes: string[];
   tempo: Tempo;
+  instrument: Instrument;
 }
 
 export interface GameStats {
@@ -68,4 +70,9 @@ export interface Translations {
   sortDifficulty: string;
   sortName: string;
   sortTime: string;
+  selectInstrument: string;
+  instrumentSilence: string;
+  instrumentPiano: string;
+  instrumentGuitar: string;
+  instrumentFlute: string;
 }
