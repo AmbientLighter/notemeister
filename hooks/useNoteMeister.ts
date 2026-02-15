@@ -64,22 +64,22 @@ export const useNoteMeister = () => {
         const groups: Record<string, { totalTime: number; correct: number; count: number }> = {};
 
         stats.history.forEach(item => {
-            const name = item.note.name;
-            if (!groups[name]) groups[name] = { totalTime: 0, correct: 0, count: 0 };
-            groups[name].totalTime += item.timeTaken;
-            groups[name].correct += item.correct ? 1 : 0;
-            groups[name].count += 1;
+            const id = `${item.note.name}${item.note.octave}`;
+            if (!groups[id]) groups[id] = { totalTime: 0, correct: 0, count: 0 };
+            groups[id].totalTime += item.timeTaken;
+            groups[id].correct += item.correct ? 1 : 0;
+            groups[id].count += 1;
         });
 
-        const rows = Object.entries(groups).map(([name, data]) => ({
-            name,
+        const rows = Object.entries(groups).map(([id, data]) => ({
+            name: id,
             avgTime: data.totalTime / data.count,
             accuracy: (data.correct / data.count) * 100,
             count: data.count
         }));
 
         return rows.sort((a, b) => {
-            if (sortMethod === 'name') return a.name.localeCompare(b.name);
+            if (sortMethod === 'name') return a.name.localeCompare(b.name, undefined, { numeric: true });
             if (sortMethod === 'time') return b.avgTime - a.avgTime;
             if (a.accuracy !== b.accuracy) return a.accuracy - b.accuracy;
             return b.avgTime - a.avgTime;

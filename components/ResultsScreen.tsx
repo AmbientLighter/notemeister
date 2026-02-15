@@ -88,7 +88,7 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
                                 {noteStats.map((item) => (
                                     <tr key={item.name} className="hover:bg-slate-50 dark:hover:bg-slate-700/50">
                                         <td className="px-4 py-3 font-bold text-slate-700 dark:text-slate-300">
-                                            <span className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center border border-slate-200 dark:border-slate-600">
+                                            <span className="w-9 h-9 text-xs rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center border border-slate-200 dark:border-slate-600">
                                                 {item.name}
                                             </span>
                                         </td>
