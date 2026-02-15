@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import { Formatter, Renderer, Stave, StaveNote, Voice } from 'vexflow';
-import type { ClefType, Note } from '../types';
+import type { ClefType, Note } from '@/types';
 
-import { useTheme } from '../hooks/useTheme';
+import { useTheme } from '@/hooks/useTheme';
 
 interface StaffCanvasProps {
   clef: ClefType;

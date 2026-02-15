@@ -1,6 +1,6 @@
 import React from 'react';
-import { SUPPORTED_LANGUAGES } from '../constants';
-import { useTranslations } from '../hooks/useTranslations';
+import { SUPPORTED_LANGUAGES } from '@/constants';
+import { useTranslations } from '@/hooks/useTranslations';
 
 const LanguagePicker: React.FC = () => {
   const { language, setLanguage } = useTranslations();

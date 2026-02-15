@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { NOTE_NAMES } from '../constants';
-import type { ClefType, GameSettings, GameStats, Note, Screen } from '../types';
+import { NOTE_NAMES } from '@/constants';
+import type { ClefType, GameSettings, GameStats, Note, Screen } from '@/types';
 
 interface GameState {
   // Navigation

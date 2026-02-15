@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import PitchWorker from '../workers/pitchWorker?worker';
-import { getNoteFromFrequency } from '../utils/musicLogic';
-import { BASE_URL } from '../constants';
+import PitchWorker from '@/workers/pitchWorker?worker';
+import { getNoteFromFrequency } from '@/utils/musicLogic';
+import { BASE_URL } from '@/constants';
 
 export const usePitchDetection = () => {
   const [note, setNote] = useState<string>('-');

@@ -1,6 +1,6 @@
 import React from 'react';
-import { useGameStore } from '../store/useGameStore';
-import { useTranslations } from '../hooks/useTranslations';
+import { useGameStore } from '@/store/useGameStore';
+import { useTranslations } from '@/hooks/useTranslations';
 
 const TempoSelector: React.FC = () => {
   const { t } = useTranslations();

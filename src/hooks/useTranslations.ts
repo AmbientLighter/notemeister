@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Language } from '../types';
-import { TRANSLATIONS, SUPPORTED_LANGUAGES } from '../constants';
+import type { Language } from '@/types';
+import { TRANSLATIONS, SUPPORTED_LANGUAGES } from '@/constants';
 
 const detectLanguage = (): Language => {
   const browserLang = navigator.language.split('-')[0] as Language;

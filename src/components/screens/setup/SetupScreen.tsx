@@ -1,7 +1,7 @@
 import React from 'react';
-import { useTranslations } from '../hooks/useTranslations';
-import { useGameStore } from '../store/useGameStore';
-import { useSessionStore } from '../store/useSessionStore';
+import { useTranslations } from '@/hooks/useTranslations';
+import { useGameStore } from '@/store/useGameStore';
+import { useSessionStore } from '@/store/useSessionStore';
 import ClefSelector from './ClefSelector';
 import InstrumentSelector from './InstrumentSelector';
 import InteractiveStaff from './InteractiveStaff';

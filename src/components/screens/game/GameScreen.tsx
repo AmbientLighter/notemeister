@@ -1,13 +1,13 @@
 import React from 'react';
-import type { NoteName } from '../types';
-import { useGameStore } from '../store/useGameStore';
-import { useSessionStore } from '../store/useSessionStore';
+import type { NoteName } from '@/types';
+import { useGameStore } from '@/store/useGameStore';
+import { useSessionStore } from '@/store/useSessionStore';
 import StaffCanvas from './StaffCanvas';
 import Keyboard from './Keyboard';
 import StatsHeader from './StatsHeader';
 import FinishSessionButton from './FinishSessionButton';
-import { useTranslations } from '../hooks/useTranslations';
-import { usePitchDetection } from '../hooks/usePitchDetection';
+import { useTranslations } from '@/hooks/useTranslations';
+import { usePitchDetection } from '@/hooks/usePitchDetection';
 import MicStatusOverlay from './MicStatusOverlay';
 
 const GameScreen: React.FC = () => {

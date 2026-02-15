@@ -1,6 +1,6 @@
 import React from 'react';
-import { useGameStore } from '../store/useGameStore';
-import { useTranslations } from '../hooks/useTranslations';
+import { useGameStore } from '@/store/useGameStore';
+import { useTranslations } from '@/hooks/useTranslations';
 
 const SummaryGrid: React.FC = () => {
   const { t } = useTranslations();

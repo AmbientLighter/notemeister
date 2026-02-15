@@ -1,7 +1,7 @@
 import { create } from 'zustand';
-import type { Note, NoteName } from '../types';
-import { generateRandomNote } from '../utils/musicLogic';
-import { audioEngine } from '../utils/audio';
+import type { Note, NoteName } from '@/types';
+import { generateRandomNote } from '@/utils/musicLogic';
+import { audioEngine } from '@/utils/audio';
 import { useGameStore } from './useGameStore';
 
 interface SessionState {

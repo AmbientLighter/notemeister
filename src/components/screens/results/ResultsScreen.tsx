@@ -1,11 +1,11 @@
 import React from 'react';
-import { useGameStore } from '../store/useGameStore';
-import { useTranslations } from '../hooks/useTranslations';
+import { useGameStore } from '@/store/useGameStore';
+import { useTranslations } from '@/hooks/useTranslations';
 import { Check } from 'lucide-react';
 import HeatmapCanvas from './HeatmapCanvas';
 import DetailedStats from './DetailedStats';
 import SummaryGrid from './SummaryGrid';
-import { audioEngine } from '../utils/audio';
+import { audioEngine } from '@/utils/audio';
 
 const ResultsScreen: React.FC = () => {
   const { t } = useTranslations();

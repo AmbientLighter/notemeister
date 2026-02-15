@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { useTranslations } from '../hooks/useTranslations';
-import type { SortMethod, NoteStat } from '../types';
+import { useTranslations } from '@/hooks/useTranslations';
+import type { SortMethod, NoteStat } from '@/types';
 
 interface DetailedStatsProps {
   noteStats: NoteStat[]; // Aggregated but unsorted stats

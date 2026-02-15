@@ -1,7 +1,7 @@
 import React from 'react';
-import { useGameStore } from '../store/useGameStore';
-import { useTranslations } from '../hooks/useTranslations';
-import type { Instrument } from '../types';
+import { useGameStore } from '@/store/useGameStore';
+import { useTranslations } from '@/hooks/useTranslations';
+import type { Instrument } from '@/types';
 
 const InstrumentSelector: React.FC = () => {
   const { t } = useTranslations();

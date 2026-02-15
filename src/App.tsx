@@ -1,9 +1,9 @@
 import React from 'react';
-import { useGameStore } from './store/useGameStore';
-import { useTheme } from './hooks/useTheme';
-import SetupScreen from './components/SetupScreen';
-import GameScreen from './components/GameScreen';
-import ResultsScreen from './components/ResultsScreen';
+import { useGameStore } from '@/store/useGameStore';
+import { useTheme } from '@/hooks/useTheme';
+import SetupScreen from '@/components/screens/setup/SetupScreen';
+import GameScreen from '@/components/screens/game/GameScreen';
+import ResultsScreen from '@/components/screens/results/ResultsScreen';
 
 const SCREEN_COMPONENTS: Record<string, React.FC> = {
   setup: SetupScreen,

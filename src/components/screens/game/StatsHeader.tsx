@@ -1,7 +1,7 @@
 import React from 'react';
-import { useGameStore } from '../store/useGameStore';
+import { useGameStore } from '@/store/useGameStore';
 import FinishSessionButton from './FinishSessionButton';
-import { useTranslations } from '../hooks/useTranslations';
+import { useTranslations } from '@/hooks/useTranslations';
 
 const StatsHeader: React.FC = () => {
   const { t } = useTranslations();

@@ -1,6 +1,6 @@
 import React from 'react';
-import { NOTE_NAMES } from '../constants';
-import type { NoteName } from '../types';
+import { NOTE_NAMES } from '@/constants';
+import type { NoteName } from '@/types';
 
 interface KeyboardProps {
   onNoteSelect: (note: NoteName) => void;
