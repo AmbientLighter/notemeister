@@ -55,6 +55,8 @@ export interface GameHistoryItem {
 }
 
 export interface Translations {
+  pause: string;
+  resume: string;
   title: string;
   subtitle: string;
   setupTitle: string;

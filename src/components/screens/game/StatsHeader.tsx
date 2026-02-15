@@ -43,9 +43,11 @@ const StatsHeader: React.FC = () => {
           </div>
         </div>
       )}
-      <div className="hidden lg:block text-center col-span-full lg:col-span-1 border-t lg:border-t-0 lg:border-l border-slate-100 dark:border-slate-700 pt-4 lg:pt-0 lg:pl-4">
-        <FinishSessionButton />
-      </div>
+      {settings.gameMode !== 'scrolling' && (
+        <div className="hidden lg:block text-center col-span-full lg:col-span-1 border-t lg:border-t-0 lg:border-l border-slate-100 dark:border-slate-700 pt-4 lg:pt-0 lg:pl-4">
+          <FinishSessionButton />
+        </div>
+      )}
     </div>
   );
 };

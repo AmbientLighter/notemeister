@@ -11,6 +11,8 @@ export const useScrollingMode = () => {
   const feedback = useScrollingStore((state) => state.feedback);
   const lastCorrectNote = useScrollingStore((state) => state.lastCorrectNote);
   const lastIncorrectNote = useScrollingStore((state) => state.lastIncorrectNote);
+  const isPaused = useScrollingStore((state) => state.isPaused);
+  const setPaused = useScrollingStore((state) => state.setPaused);
 
   const isScrolling = settings.gameMode === 'scrolling';
 
@@ -24,15 +26,17 @@ export const useScrollingMode = () => {
       const deltaTime = now - lastTime;
       lastTime = now;
 
-      const speedMap = { slow: 0.01, normal: 0.02, fast: 0.04 };
-      updateNotePositions(deltaTime, speedMap[settings.tempo]);
+      if (!useScrollingStore.getState().isPaused) {
+        const speedMap = { slow: 0.01, normal: 0.02, fast: 0.04 };
+        updateNotePositions(deltaTime, speedMap[settings.tempo]);
 
-      const spawnIntervalMap = { slow: 3000, normal: 2000, fast: 1000 };
-      if (
-        Date.now() - useScrollingStore.getState().lastSpawnTime >
-        spawnIntervalMap[settings.tempo]
-      ) {
-        spawnNote();
+        const spawnIntervalMap = { slow: 3000, normal: 2000, fast: 1000 };
+        if (
+          Date.now() - useScrollingStore.getState().lastSpawnTime >
+          spawnIntervalMap[settings.tempo]
+        ) {
+          spawnNote();
+        }
       }
 
       frameId = requestAnimationFrame(loop);
@@ -40,12 +44,12 @@ export const useScrollingMode = () => {
 
     frameId = requestAnimationFrame(loop);
 
-    if (useScrollingStore.getState().scrollingNotes.length === 0) {
+    if (useScrollingStore.getState().scrollingNotes.length === 0 && !isPaused) {
       spawnNote();
     }
 
     return () => cancelAnimationFrame(frameId);
-  }, [isScrolling, settings.tempo, spawnNote, updateNotePositions]);
+  }, [isScrolling, settings.tempo, spawnNote, updateNotePositions, isPaused]);
 
   return {
     scrollingNotes,
@@ -53,5 +57,7 @@ export const useScrollingMode = () => {
     feedback,
     lastCorrectNote,
     lastIncorrectNote,
+    isPaused,
+    setPaused,
   };
 };

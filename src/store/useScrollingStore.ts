@@ -11,6 +11,7 @@ interface ScrollingState {
   feedback: { type: 'correct' | 'incorrect'; message?: string } | null;
   lastCorrectNote: NoteName | null;
   lastIncorrectNote: NoteName | null;
+  isPaused: boolean;
 
   // Actions
   startGame: () => void;
@@ -21,6 +22,7 @@ interface ScrollingState {
     translations: { correctAnswer: string; incorrectAnswer: string }
   ) => void;
   resetSession: () => void;
+  setPaused: (paused: boolean) => void;
 }
 
 export const useScrollingStore = create<ScrollingState>((set, get) => ({
@@ -30,6 +32,7 @@ export const useScrollingStore = create<ScrollingState>((set, get) => ({
   feedback: null,
   lastCorrectNote: null,
   lastIncorrectNote: null,
+  isPaused: false,
 
   resetSession: () =>
     set({
@@ -39,7 +42,10 @@ export const useScrollingStore = create<ScrollingState>((set, get) => ({
       feedback: null,
       lastCorrectNote: null,
       lastIncorrectNote: null,
+      isPaused: false,
     }),
+
+  setPaused: (paused) => set({ isPaused: paused }),
 
   startGame: () => {
     audioEngine.init();
