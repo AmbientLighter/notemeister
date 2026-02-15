@@ -1,18 +1,13 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { NOTE_NAMES } from '../constants';
 import {
+    ClefType,
     GameSettings,
     GameStats,
     Note,
-    NoteName,
-    Screen,
-    SortMethod,
-    Language,
-    ClefType
+    Screen
 } from '../types';
-import { generateRandomNote } from '../utils/musicLogic';
-import { audioEngine } from '../utils/audio';
-import { NOTE_NAMES } from '../constants';
 
 
 
@@ -34,9 +29,6 @@ interface GameState {
     // Stats Management
     resetStats: () => void;
     recordTurn: (note: Note, timeTaken: number, correct: boolean) => void;
-
-    // Selectors
-    getNoteStats: () => any[];
 }
 
 const DEFAULT_SETTINGS: GameSettings = {
@@ -147,26 +139,6 @@ export const useGameStore = create<GameState>()(
                     }]
                 }
             })),
-
-            getNoteStats: () => {
-                const { stats } = get();
-                const groups: Record<string, { totalTime: number; correct: number; count: number }> = {};
-
-                stats.history.forEach(item => {
-                    const id = `${item.note.name}${item.note.octave}`;
-                    if (!groups[id]) groups[id] = { totalTime: 0, correct: 0, count: 0 };
-                    groups[id].totalTime += item.timeTaken;
-                    groups[id].correct += item.correct ? 1 : 0;
-                    groups[id].count += 1;
-                });
-
-                return Object.entries(groups).map(([id, data]) => ({
-                    name: id,
-                    avgTime: data.totalTime / data.count,
-                    accuracy: (data.correct / data.count) * 100,
-                    count: data.count
-                }));
-            },
         }),
         {
             name: 'note-meister-storage',

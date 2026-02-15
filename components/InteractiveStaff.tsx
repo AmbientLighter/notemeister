@@ -1,11 +1,9 @@
-import React, { useRef, useEffect, useState, useMemo } from 'react';
-import { ClefType, Note } from '../types';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { NOTE_NAMES, OCTAVE_RANGES } from '../constants';
-import { getNoteVisualPosition, getNoteKey, parseNoteKey } from '../utils/musicLogic';
+import { ClefType, Note } from '../types';
+import { getNoteKey, getNoteVisualPosition, parseNoteKey } from '../utils/musicLogic';
 
 import { useTheme } from '../hooks/useTheme';
-
-
 
 interface InteractiveStaffProps {
   clef: ClefType;

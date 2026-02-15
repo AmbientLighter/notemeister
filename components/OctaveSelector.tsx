@@ -1,7 +1,7 @@
 import React from 'react';
-import { useGameStore } from '../store/useGameStore';
-import { useTranslations } from '../hooks/useTranslations';
 import { OCTAVE_RANGES } from '../constants';
+import { useTranslations } from '../hooks/useTranslations';
+import { useGameStore } from '../store/useGameStore';
 
 const OctaveSelector: React.FC = () => {
     const { t } = useTranslations();

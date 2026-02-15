@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-import { Renderer, StaveNote, Voice, Formatter, Stave } from 'vexflow';
+import { Formatter, Renderer, Stave, StaveNote, Voice } from 'vexflow';
+import { useTheme } from '../hooks/useTheme';
 
 interface NoteStat {
     name: string;
@@ -7,8 +8,6 @@ interface NoteStat {
     accuracy: number;
     count: number;
 }
-
-import { useTheme } from '../hooks/useTheme';
 
 interface HeatmapCanvasProps {
     noteStats: NoteStat[];

@@ -1,13 +1,11 @@
 import React from 'react';
 import { useGameStore } from '../store/useGameStore';
-import { useSessionStore } from '../store/useSessionStore';
 import FinishSessionButton from './FinishSessionButton';
 import { useTranslations } from '../hooks/useTranslations';
 
 const StatsHeader: React.FC = () => {
     const { t } = useTranslations();
     const stats = useGameStore((state) => state.stats);
-    const feedback = useSessionStore((state) => state.feedback);
 
     return (
         <div className="w-full grid grid-cols-3 md:grid-cols-4 gap-4 pt-0 pb-4 px-4 sm:p-6 bg-white dark:bg-slate-800 sm:rounded-b-3xl shadow-sm mb-4 sm:mb-6 transition-colors duration-200">

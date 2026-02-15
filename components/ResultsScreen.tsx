@@ -1,16 +1,33 @@
 import React from 'react';
-import { useGameStore } from '../store/useGameStore';
-import HeatmapCanvas from './HeatmapCanvas';
 import { useTranslations } from '../hooks/useTranslations';
+import { useGameStore } from '../store/useGameStore';
 import DetailedStats from './DetailedStats';
+import HeatmapCanvas from './HeatmapCanvas';
 import SummaryGrid from './SummaryGrid';
 
 const ResultsScreen: React.FC = () => {
     const { t } = useTranslations();
     const settings = useGameStore((state) => state.settings);
-    const getNoteStats = useGameStore((state) => state.getNoteStats);
+    const stats = useGameStore((state) => state.stats);
 
-    const noteStats = React.useMemo(() => getNoteStats(), [getNoteStats]);
+    const noteStats = React.useMemo(() => {
+        const groups: Record<string, { totalTime: number; correct: number; count: number }> = {};
+
+        stats.history.forEach(item => {
+            const id = `${item.note.name}${item.note.octave}`;
+            if (!groups[id]) groups[id] = { totalTime: 0, correct: 0, count: 0 };
+            groups[id].totalTime += item.timeTaken;
+            groups[id].correct += item.correct ? 1 : 0;
+            groups[id].count += 1;
+        });
+
+        return Object.entries(groups).map(([id, data]) => ({
+            name: id,
+            avgTime: data.totalTime / data.count,
+            accuracy: (data.correct / data.count) * 100,
+            count: data.count
+        }));
+    }, [stats.history]);
 
     // Actions
     const setScreen = useGameStore((state) => state.setScreen);

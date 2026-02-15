@@ -1,13 +1,13 @@
 import React from 'react';
+import { useTranslations } from '../hooks/useTranslations';
 import { useGameStore } from '../store/useGameStore';
 import { useSessionStore } from '../store/useSessionStore';
-import InteractiveStaff from './InteractiveStaff';
-import { useTranslations } from '../hooks/useTranslations';
-import LanguagePicker from './LanguagePicker';
 import ClefSelector from './ClefSelector';
+import InstrumentSelector from './InstrumentSelector';
+import InteractiveStaff from './InteractiveStaff';
+import LanguagePicker from './LanguagePicker';
 import OctaveSelector from './OctaveSelector';
 import TempoSelector from './TempoSelector';
-import InstrumentSelector from './InstrumentSelector';
 
 const SetupScreen: React.FC = () => {
     const { t } = useTranslations();
