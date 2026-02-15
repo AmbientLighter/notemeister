@@ -64,3 +64,39 @@ export const generateRandomNote = (activeNotes: string[], lastNote?: Note): Note
 
   return newNote;
 };
+
+// Music Theory Constants for Pitch Detection
+const CHROMATIC_TO_NATURAL_MAP: Record<number, string> = {
+  0: 'C',
+  1: 'C', // C# -> C
+  2: 'D',
+  3: 'E', // D# -> E
+  4: 'E',
+  5: 'F',
+  6: 'F', // F# -> F
+  7: 'G',
+  8: 'G', // G# -> G
+  9: 'A',
+  10: 'B', // A# -> B
+  11: 'B',
+};
+
+/**
+ * Converts a frequency (Hz) to a musical note name and octave.
+ * Filter out obviously incorrect or extreme frequencies before calling.
+ */
+export const getNoteFromFrequency = (freq: number): { name: string; octave: number } | null => {
+  // 440Hz is A4
+  const number = 12 * Math.log2(freq / 440) + 69;
+  const rounded = Math.round(number);
+
+  // Standard modulo for potential negative numbers
+  const noteIndex = ((rounded % 12) + 12) % 12;
+  const noteName = CHROMATIC_TO_NATURAL_MAP[noteIndex];
+  const octave = Math.floor(rounded / 12) - 1;
+
+  if (noteName) {
+    return { name: noteName, octave };
+  }
+  return null;
+};
