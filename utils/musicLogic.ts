@@ -34,15 +34,22 @@ export const getNoteVisualPosition = (clef: ClefType, note: Note): number => {
   return refIndex - noteIndex;
 };
 
-export const generateRandomNote = (clef: ClefType, allowedOctaves: number[], lastNote?: Note): Note => {
-  // Filter out invalid octaves if any passed
+export const generateRandomNote = (
+  clef: ClefType, 
+  allowedOctaves: number[], 
+  allowedNotes: NoteName[] = NOTE_NAMES,
+  lastNote?: Note
+): Note => {
+  // Filter out invalid octaves/notes if any passed
   if (allowedOctaves.length === 0) {
-    // Fallback defaults
     allowedOctaves = clef === 'treble' ? [4, 5] : [2, 3];
+  }
+  if (allowedNotes.length === 0) {
+    allowedNotes = [...NOTE_NAMES];
   }
 
   const octave = allowedOctaves[Math.floor(Math.random() * allowedOctaves.length)];
-  const name = NOTE_NAMES[Math.floor(Math.random() * NOTE_NAMES.length)];
+  const name = allowedNotes[Math.floor(Math.random() * allowedNotes.length)];
   
   const newNote: Note = {
     name,
@@ -51,8 +58,12 @@ export const generateRandomNote = (clef: ClefType, allowedOctaves: number[], las
   };
 
   // Prevent same note twice in a row for better training variety
+  // Only try to prevent if there is more than 1 possible combination
   if (lastNote && lastNote.absoluteIndex === newNote.absoluteIndex) {
-    return generateRandomNote(clef, allowedOctaves, lastNote);
+    const totalCombinations = allowedOctaves.length * allowedNotes.length;
+    if (totalCombinations > 1) {
+        return generateRandomNote(clef, allowedOctaves, allowedNotes, lastNote);
+    }
   }
 
   return newNote;

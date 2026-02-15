@@ -12,6 +12,7 @@ export interface GameSettings {
   language: Language;
   clef: ClefType;
   selectedOctaves: number[];
+  selectedNotes: NoteName[];
 }
 
 export interface GameStats {
@@ -35,6 +36,7 @@ export interface Translations {
   selectLanguage: string;
   selectClef: string;
   selectOctaves: string;
+  selectNotes: string;
   startSession: string;
   correct: string;
   total: string;
@@ -51,6 +53,7 @@ export interface Translations {
   incorrectAnswer: string;
   octave: string;
   noOctavesSelected: string;
+  noNotesSelected: string;
   avgTime: string;
   statNote: string;
   statAccuracy: string;

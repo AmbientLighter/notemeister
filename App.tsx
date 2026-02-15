@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { GameSettings, GameStats, Note, NoteName, Language, ClefType } from './types';
-import { TRANSLATIONS, OCTAVE_RANGES } from './constants';
+import { TRANSLATIONS, OCTAVE_RANGES, NOTE_NAMES } from './constants';
 import { generateRandomNote } from './utils/musicLogic';
 import StaffCanvas from './components/StaffCanvas';
 import Keyboard from './components/Keyboard';
@@ -17,7 +17,8 @@ const App: React.FC = () => {
   const [settings, setSettings] = useState<GameSettings>({
     language: 'en',
     clef: 'treble',
-    selectedOctaves: [4, 5] // Default for treble
+    selectedOctaves: [4, 5], // Default for treble
+    selectedNotes: [...NOTE_NAMES]
   });
 
   // Game Data
@@ -99,6 +100,23 @@ const App: React.FC = () => {
     });
   };
 
+  const toggleNote = (note: NoteName) => {
+    setSettings(prev => {
+      const current = prev.selectedNotes;
+      if (current.includes(note)) {
+        // Prevent deselecting the last note
+        if (current.length === 1) return prev;
+        return { ...prev, selectedNotes: current.filter(n => n !== note) };
+      } else {
+        // Re-add in correct order
+        const newNotes = [...current, note].sort((a, b) => 
+            NOTE_NAMES.indexOf(a) - NOTE_NAMES.indexOf(b)
+        );
+        return { ...prev, selectedNotes: newNotes };
+      }
+    });
+  };
+
   const startGame = () => {
     setStats({ correct: 0, total: 0, streak: 0, history: [] });
     setScreen('game');
@@ -106,14 +124,19 @@ const App: React.FC = () => {
   };
 
   const nextTurn = useCallback((firstTurn = false) => {
-    const newNote = generateRandomNote(settings.clef, settings.selectedOctaves, currentNote || undefined);
+    const newNote = generateRandomNote(
+      settings.clef, 
+      settings.selectedOctaves, 
+      settings.selectedNotes, 
+      currentNote || undefined
+    );
     setCurrentNote(newNote);
     setFeedback(null);
     setIsProcessing(false);
     setLastCorrectNote(null);
     setLastIncorrectNote(null);
     setStartTime(Date.now());
-  }, [settings.clef, settings.selectedOctaves, currentNote]);
+  }, [settings.clef, settings.selectedOctaves, settings.selectedNotes, currentNote]);
 
   const handleNoteSelect = (selectedName: NoteName) => {
     if (isProcessing || !currentNote) return;
@@ -210,7 +233,7 @@ const App: React.FC = () => {
       </div>
 
       {/* Octave Selection */}
-      <div className="mb-8">
+      <div className="mb-6">
         <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-wide">{t.selectOctaves}</label>
         <div className="flex flex-wrap gap-3 justify-center">
           {OCTAVE_RANGES[settings.clef].map(octave => (
@@ -232,9 +255,32 @@ const App: React.FC = () => {
         )}
       </div>
 
+      {/* Note Selection */}
+      <div className="mb-8">
+        <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-wide">{t.selectNotes}</label>
+        <div className="flex flex-wrap gap-2 justify-center">
+          {NOTE_NAMES.map(note => (
+            <button
+              key={note}
+              onClick={() => toggleNote(note)}
+              className={`w-10 h-10 rounded-lg font-bold text-lg flex items-center justify-center transition-all ${
+                settings.selectedNotes.includes(note)
+                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200 dark:shadow-none scale-105'
+                  : 'bg-white dark:bg-slate-700 border-2 border-slate-200 dark:border-slate-600 text-slate-400 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-500'
+              }`}
+            >
+              {note}
+            </button>
+          ))}
+        </div>
+        {settings.selectedNotes.length === 0 && (
+          <p className="text-red-500 text-sm mt-2 text-center">{t.noNotesSelected}</p>
+        )}
+      </div>
+
       <button
         onClick={startGame}
-        disabled={settings.selectedOctaves.length === 0}
+        disabled={settings.selectedOctaves.length === 0 || settings.selectedNotes.length === 0}
         className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-bold rounded-xl text-lg shadow-lg shadow-indigo-200 dark:shadow-none transition-transform active:scale-95"
       >
         {t.startSession}
@@ -293,10 +339,12 @@ const App: React.FC = () => {
                 className="w-full h-full"
             />
             {/* Range Indicators (Optional visual flair) */}
-            <div className="absolute top-2 right-2 flex gap-1">
-                {settings.selectedOctaves.map(o => (
-                    <span key={o} className="text-[10px] bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-400 px-1 rounded border border-slate-200 dark:border-slate-600">{o}</span>
-                ))}
+            <div className="absolute top-2 right-2 flex flex-col gap-1 items-end">
+                <div className="flex gap-1">
+                  {settings.selectedOctaves.map(o => (
+                      <span key={o} className="text-[10px] bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-400 px-1 rounded border border-slate-200 dark:border-slate-600">{o}</span>
+                  ))}
+                </div>
             </div>
         </div>
 

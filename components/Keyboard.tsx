@@ -40,10 +40,10 @@ const Keyboard: React.FC<KeyboardProps> = ({
             onClick={() => !disabled && onNoteSelect(note)}
             disabled={disabled}
             className={`
-              h-20 md:h-24 
+              h-24 md:h-32 
               w-[22%] md:w-auto flex-grow md:flex-grow-0
               rounded-xl md:rounded-2xl
-              font-bold text-2xl md:text-3xl 
+              font-bold text-3xl md:text-5xl 
               transition-all duration-100 select-none
               flex items-center justify-center shadow-md
               active:scale-95
