@@ -10,6 +10,20 @@ export const getAbsoluteNoteIndex = (name: NoteName, octave: number): number => 
   return octave * 7 + NOTE_INDEX_MAP[name];
 };
 
+// Helper to convert Note to "C4" string
+export const getNoteKey = (note: Note): string => `${note.name}${note.octave}`;
+
+// Helper to convert "C4" string to Note object
+export const parseNoteKey = (key: string): Note => {
+  const name = key.charAt(0) as NoteName;
+  const octave = parseInt(key.slice(1), 10);
+  return {
+    name,
+    octave,
+    absoluteIndex: getAbsoluteNoteIndex(name, octave)
+  };
+};
+
 // Returns visual position relative to the staff top line.
 // 0 = Top Line
 // Positive = Downwards
@@ -35,34 +49,22 @@ export const getNoteVisualPosition = (clef: ClefType, note: Note): number => {
 };
 
 export const generateRandomNote = (
-  clef: ClefType, 
-  allowedOctaves: number[], 
-  allowedNotes: NoteName[] = NOTE_NAMES,
+  activeNotes: string[],
   lastNote?: Note
 ): Note => {
-  // Filter out invalid octaves/notes if any passed
-  if (allowedOctaves.length === 0) {
-    allowedOctaves = clef === 'treble' ? [4, 5] : [2, 3];
-  }
-  if (allowedNotes.length === 0) {
-    allowedNotes = [...NOTE_NAMES];
+  // Fallback if empty (should be prevented by UI)
+  if (!activeNotes || activeNotes.length === 0) {
+    return { name: 'C', octave: 4, absoluteIndex: getAbsoluteNoteIndex('C', 4) };
   }
 
-  const octave = allowedOctaves[Math.floor(Math.random() * allowedOctaves.length)];
-  const name = allowedNotes[Math.floor(Math.random() * allowedNotes.length)];
-  
-  const newNote: Note = {
-    name,
-    octave,
-    absoluteIndex: getAbsoluteNoteIndex(name, octave)
-  };
+  const randomKey = activeNotes[Math.floor(Math.random() * activeNotes.length)];
+  const newNote = parseNoteKey(randomKey);
 
   // Prevent same note twice in a row for better training variety
   // Only try to prevent if there is more than 1 possible combination
   if (lastNote && lastNote.absoluteIndex === newNote.absoluteIndex) {
-    const totalCombinations = allowedOctaves.length * allowedNotes.length;
-    if (totalCombinations > 1) {
-        return generateRandomNote(clef, allowedOctaves, allowedNotes, lastNote);
+    if (activeNotes.length > 1) {
+        return generateRandomNote(activeNotes, lastNote);
     }
   }
 

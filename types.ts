@@ -12,8 +12,8 @@ export interface Note {
 export interface GameSettings {
   language: Language;
   clef: ClefType;
-  selectedOctaves: number[];
-  selectedNotes: NoteName[];
+  // activeNotes stores specific notes like "C4", "D5", etc.
+  activeNotes: string[]; 
   tempo: Tempo;
 }
 

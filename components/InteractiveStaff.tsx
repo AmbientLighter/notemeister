@@ -1,23 +1,71 @@
-import React, { useRef, useEffect, useState } from 'react';
-import { ClefType, NoteName, Note } from '../types';
-import { NOTE_NAMES } from '../constants';
-import { getNoteVisualPosition } from '../utils/musicLogic';
+import React, { useRef, useEffect, useState, useMemo } from 'react';
+import { ClefType, Note, NoteName } from '../types';
+import { NOTE_NAMES, OCTAVE_RANGES } from '../constants';
+import { getNoteVisualPosition, getNoteKey, parseNoteKey } from '../utils/musicLogic';
 
 interface InteractiveStaffProps {
   clef: ClefType;
-  selectedNotes: NoteName[];
-  onToggleNote: (note: NoteName) => void;
+  activeNotes: string[];
+  onToggleNote: (noteKey: string) => void;
   darkMode: boolean;
 }
 
 const InteractiveStaff: React.FC<InteractiveStaffProps> = ({
   clef,
-  selectedNotes,
+  activeNotes,
   onToggleNote,
   darkMode
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [hoveredNote, setHoveredNote] = useState<NoteName | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [hoveredKey, setHoveredKey] = useState<string | null>(null);
+
+  // Determine which octaves are currently active
+  const activeOctaves = useMemo(() => {
+    const octs = new Set<number>();
+    activeNotes.forEach(key => {
+        // Parse "C4" -> 4
+        const note = parseNoteKey(key);
+        octs.add(note.octave);
+    });
+    return octs;
+  }, [activeNotes]);
+
+  // Determine which octaves to display
+  // Rule: If notes from >1 octave are selected, show full range.
+  // Rule: If notes from 1 octave are selected, show only that octave.
+  // Rule: If 0 notes, show default single octave.
+  const displayOctaves = useMemo(() => {
+    // If multiple octaves involved, show everything ("Full Blown")
+    if (activeOctaves.size > 1) {
+        return OCTAVE_RANGES[clef];
+    }
+    
+    // If single octave selected, show just that one
+    if (activeOctaves.size === 1) {
+        return [Array.from(activeOctaves)[0]];
+    }
+
+    // Default fallback if nothing selected
+    return clef === 'treble' ? [4] : [3];
+  }, [clef, activeOctaves]);
+
+  const isMultiOctaveView = displayOctaves.length > 1;
+
+  // Flatten octaves into displayable notes
+  const displayNotes = useMemo(() => {
+    const notes: Note[] = [];
+    displayOctaves.forEach(octave => {
+      NOTE_NAMES.forEach(name => {
+        notes.push({ 
+            name, 
+            octave, 
+            absoluteIndex: 0 
+        });
+      });
+    });
+    return notes;
+  }, [displayOctaves]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -27,32 +75,42 @@ const InteractiveStaff: React.FC<InteractiveStaffProps> = ({
     if (!ctx) return;
 
     const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
     
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
-    ctx.scale(dpr, dpr);
+    // Config
+    const noteSpacing = 40;
+    const paddingX = 40;
+    const clefSpace = 60;
+    const totalWidth = clefSpace + (displayNotes.length * noteSpacing) + paddingX;
+    const height = 180; // Fixed height
 
-    const width = rect.width;
-    const height = rect.height;
+    // Resize Canvas
+    canvas.width = totalWidth * dpr;
+    canvas.height = height * dpr;
+    
+    // Style adjustments for CSS size vs Actual size
+    canvas.style.width = `${totalWidth}px`;
+    canvas.style.height = `${height}px`;
+
+    ctx.scale(dpr, dpr);
 
     // --- Colors ---
     const lineColor = darkMode ? '#94a3b8' : '#1e293b';
-    const activeColor = darkMode ? '#818cf8' : '#4f46e5'; // Indigo-400/600
-    const inactiveColor = darkMode ? '#334155' : '#cbd5e1'; // Slate-700/300
-    
-    // Clear
-    ctx.clearRect(0, 0, width, height);
+    const activeColor = darkMode ? '#818cf8' : '#4f46e5'; // Indigo
+    const inactiveColor = darkMode ? '#334155' : '#cbd5e1'; // Slate
+    const hoverColor = darkMode ? '#64748b' : '#94a3b8';
 
-    // Configuration
-    const staffHeight = height * 0.3; // slightly smaller staff to fit labels
+    // Clear
+    ctx.clearRect(0, 0, totalWidth, height);
+
+    // Geometry
+    const staffHeight = 50; 
     const staffTopY = (height - staffHeight) / 2 - 10;
     const lineSpacing = staffHeight / 4;
     const staffStartX = 20;
-    const staffEndX = width - 20;
+    const staffEndX = totalWidth - 20;
 
     // Draw Staff Lines
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1;
     ctx.strokeStyle = lineColor;
     ctx.lineCap = 'round';
 
@@ -64,9 +122,9 @@ const InteractiveStaff: React.FC<InteractiveStaffProps> = ({
       ctx.stroke();
     }
 
-    // Draw Clef (simplified or smaller)
+    // Draw Clef
     ctx.fillStyle = lineColor;
-    const fontSize = staffHeight * 1.5;
+    const fontSize = staffHeight * 1.8;
     ctx.font = `${fontSize}px serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -78,29 +136,20 @@ const InteractiveStaff: React.FC<InteractiveStaffProps> = ({
        ctx.fillText('𝄢', clefX, staffTopY + (1 * lineSpacing)); 
     }
 
-    // Notes Configuration
-    const octave = clef === 'treble' ? 4 : 3;
-    const notesAreaStartX = clefX + 40;
-    const notesAreaWidth = staffEndX - notesAreaStartX;
-    const noteSpacing = notesAreaWidth / NOTE_NAMES.length;
+    // Draw Notes
+    displayNotes.forEach((note, index) => {
+      const x = staffStartX + clefSpace + (index * noteSpacing);
+      const key = getNoteKey(note);
+      const isSelected = activeNotes.includes(key);
+      const isHovered = hoveredKey === key;
 
-    NOTE_NAMES.forEach((name, index) => {
-      const isSelected = selectedNotes.includes(name);
-      const isHovered = hoveredNote === name;
-      
-      const x = notesAreaStartX + (index * noteSpacing) + (noteSpacing / 2);
-      
-      // Calculate Y by mocking a Note object
-      // We pass 0 for absoluteIndex because getNoteVisualPosition recalculates it from name/octave anyway
-      const note: Note = { name, octave, absoluteIndex: 0 }; 
-      
       const stepsFromTop = getNoteVisualPosition(clef, note);
       const y = staffTopY + (stepsFromTop * (lineSpacing / 2));
 
-      // Draw Ledger Lines if needed
+      // Draw Ledger Lines
       const ledgerWidth = 24;
       ctx.strokeStyle = lineColor;
-      ctx.lineWidth = 1.5;
+      ctx.lineWidth = 1;
       
       if (stepsFromTop < 0) { // Above
         for (let s = -2; s >= stepsFromTop; s -= 2) {
@@ -120,9 +169,14 @@ const InteractiveStaff: React.FC<InteractiveStaffProps> = ({
         }
       }
 
-      // Draw Note Head
-      ctx.fillStyle = isSelected ? activeColor : inactiveColor;
-      if (isHovered && !isSelected) ctx.fillStyle = darkMode ? '#64748b' : '#94a3b8'; // hover effect
+      // Note Head
+      if (isSelected) {
+          ctx.fillStyle = activeColor;
+      } else if (isHovered) {
+          ctx.fillStyle = hoverColor;
+      } else {
+          ctx.fillStyle = inactiveColor;
+      }
       
       ctx.beginPath();
       const radiusX = lineSpacing * 0.65;
@@ -130,69 +184,77 @@ const InteractiveStaff: React.FC<InteractiveStaffProps> = ({
       ctx.ellipse(x, y, radiusX, radiusY, -0.2, 0, 2 * Math.PI);
       ctx.fill();
 
-      // Label
+      // Label (Note Name + Octave)
       ctx.fillStyle = isSelected ? (darkMode ? '#fff' : '#000') : (darkMode ? '#475569' : '#94a3b8');
-      ctx.font = `bold 14px sans-serif`;
-      ctx.fillText(name, x, staffTopY + staffHeight + 30);
+      ctx.font = `bold 12px sans-serif`;
+      ctx.textAlign = 'center';
       
-      // Selection Indicator (Checkmark or dot)
+      const labelY = staffTopY + staffHeight + 35;
+      ctx.fillText(key, x, labelY);
+
+      // Checkmark for selected
       if (isSelected) {
-         ctx.beginPath();
-         ctx.arc(x, staffTopY + staffHeight + 30 + 15, 3, 0, 2 * Math.PI);
-         ctx.fill();
-      }
+        ctx.beginPath();
+        ctx.arc(x, labelY + 14, 3, 0, 2 * Math.PI);
+        ctx.fill();
+     }
     });
 
-  }, [clef, selectedNotes, hoveredNote, darkMode]);
+  }, [clef, activeNotes, hoveredKey, darkMode, displayNotes]);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
-    const width = rect.width;
-
+    
+    // Reverse engineer x to index
     const staffStartX = 20;
-    const clefX = staffStartX + 30;
-    const notesAreaStartX = clefX + 40;
-    const staffEndX = width - 20;
-    const notesAreaWidth = staffEndX - notesAreaStartX;
-    const noteSpacing = notesAreaWidth / NOTE_NAMES.length;
+    const clefSpace = 60;
+    const noteSpacing = 40;
+    const startOfNotes = staffStartX + clefSpace;
 
-    if (x < notesAreaStartX) {
-        setHoveredNote(null);
+    if (x < startOfNotes - noteSpacing/2) {
+        setHoveredKey(null);
         return;
     }
 
-    const index = Math.floor((x - notesAreaStartX) / noteSpacing);
-    if (index >= 0 && index < NOTE_NAMES.length) {
-        setHoveredNote(NOTE_NAMES[index]);
+    const index = Math.round((x - startOfNotes) / noteSpacing);
+    
+    if (index >= 0 && index < displayNotes.length) {
+        setHoveredKey(getNoteKey(displayNotes[index]));
     } else {
-        setHoveredNote(null);
+        setHoveredKey(null);
     }
   };
 
   const handleMouseLeave = () => {
-    setHoveredNote(null);
+    setHoveredKey(null);
   };
 
   const handleClick = (e: React.MouseEvent) => {
-      if (hoveredNote) {
-          onToggleNote(hoveredNote);
-      }
+    if (hoveredKey) {
+        onToggleNote(hoveredKey);
+    }
   };
 
   return (
-    <div className="w-full relative">
-        <canvas
-            ref={canvasRef}
-            className="w-full h-40 cursor-pointer bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700"
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
-            onClick={handleClick}
-        />
-        <div className="text-center text-xs text-slate-400 mt-2">
-            Click notes to select/deselect
+    <div className="w-full">
+        {/* Scrollable Container with centering if content is small */}
+        <div 
+          ref={containerRef} 
+          className={`w-full overflow-x-auto pb-4 custom-scrollbar flex ${isMultiOctaveView ? 'justify-start' : 'justify-center'}`}
+        >
+            <canvas
+                ref={canvasRef}
+                className="cursor-pointer bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 flex-shrink-0"
+                onMouseMove={handleMouseMove}
+                onMouseLeave={handleMouseLeave}
+                onClick={handleClick}
+            />
+        </div>
+        <div className="text-center text-xs text-slate-400 mt-1">
+            {isMultiOctaveView ? 'Scroll to see more octaves • ' : ''} Click notes to toggle
         </div>
     </div>
   );

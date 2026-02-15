@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { GameSettings, GameStats, Note, NoteName, Language, ClefType, Tempo } from './types';
+import React, { useState, useCallback, useMemo } from 'react';
+import { GameSettings, GameStats, Note, NoteName, Language, ClefType } from './types';
 import { TRANSLATIONS, OCTAVE_RANGES, NOTE_NAMES } from './constants';
-import { generateRandomNote } from './utils/musicLogic';
+import { generateRandomNote, getNoteKey, parseNoteKey } from './utils/musicLogic';
 import StaffCanvas from './components/StaffCanvas';
 import InteractiveStaff from './components/InteractiveStaff';
 import Keyboard from './components/Keyboard';
@@ -18,10 +18,22 @@ const App: React.FC = () => {
   const [settings, setSettings] = useState<GameSettings>({
     language: 'en',
     clef: 'treble',
-    selectedOctaves: [4, 5], // Default for treble
-    selectedNotes: [...NOTE_NAMES],
+    activeNotes: [], // Initialized in useEffect or manually
     tempo: 'normal'
   });
+
+  // Initialize active notes default on first load or clef change
+  React.useEffect(() => {
+    // Default to ONE octave (4 for treble, 3 for bass) to start simple
+    if (settings.activeNotes.length === 0) {
+        const defaultOctaves = settings.clef === 'treble' ? [4] : [3];
+        const newNotes: string[] = [];
+        defaultOctaves.forEach(oct => {
+            NOTE_NAMES.forEach(name => newNotes.push(`${name}${oct}`));
+        });
+        setSettings(prev => ({ ...prev, activeNotes: newNotes }));
+    }
+  }, [settings.clef]);
 
   // Game Data
   const [currentNote, setCurrentNote] = useState<Note | null>(null);
@@ -43,7 +55,6 @@ const App: React.FC = () => {
   const t = TRANSLATIONS[settings.language];
 
   // --- Derived State ---
-  // Moved useMemo to top level to comply with Rules of Hooks
   const noteStats = useMemo(() => {
       const groups: Record<string, { totalTime: number; correct: number; count: number }> = {};
       
@@ -85,38 +96,55 @@ const App: React.FC = () => {
     setSettings(prev => ({
       ...prev,
       clef,
-      selectedOctaves: clef === 'treble' ? [4, 5] : [2, 3] // Reset octaves to sensible defaults
+      activeNotes: [] // Will trigger effect to reset defaults
     }));
   };
 
-  const toggleOctave = (octave: number) => {
+  // Bulk toggle for entire octave
+  const toggleOctaveGroup = (octave: number) => {
     setSettings(prev => {
-      const current = prev.selectedOctaves;
-      if (current.includes(octave)) {
-        // Prevent deselecting the last octave
-        if (current.length === 1) return prev;
-        return { ...prev, selectedOctaves: current.filter(o => o !== octave).sort() };
+      const octaveNotes = NOTE_NAMES.map(name => `${name}${octave}`);
+      const allSelected = octaveNotes.every(k => prev.activeNotes.includes(k));
+      
+      let newActive = [...prev.activeNotes];
+      
+      if (allSelected) {
+          // Deselect all in this octave
+          newActive = newActive.filter(k => !octaveNotes.includes(k));
       } else {
-        return { ...prev, selectedOctaves: [...current, octave].sort() };
+          // Select all in this octave
+          octaveNotes.forEach(k => {
+              if (!newActive.includes(k)) newActive.push(k);
+          });
+      }
+      
+      // Ensure at least one note remains if we are deselecting
+      if (newActive.length === 0) return prev;
+
+      return { ...prev, activeNotes: newActive };
+    });
+  };
+
+  const toggleSingleNote = (key: string) => {
+    setSettings(prev => {
+      const current = prev.activeNotes;
+      if (current.includes(key)) {
+        if (current.length === 1) return prev; // Prevent empty
+        return { ...prev, activeNotes: current.filter(k => k !== key) };
+      } else {
+        return { ...prev, activeNotes: [...current, key] };
       }
     });
   };
 
-  const toggleNote = (note: NoteName) => {
-    setSettings(prev => {
-      const current = prev.selectedNotes;
-      if (current.includes(note)) {
-        // Prevent deselecting the last note
-        if (current.length === 1) return prev;
-        return { ...prev, selectedNotes: current.filter(n => n !== note) };
-      } else {
-        // Re-add in correct order
-        const newNotes = [...current, note].sort((a, b) => 
-            NOTE_NAMES.indexOf(a) - NOTE_NAMES.indexOf(b)
-        );
-        return { ...prev, selectedNotes: newNotes };
-      }
-    });
+  // Helper to check if an octave is fully, partially, or not selected
+  const getOctaveStatus = (octave: number): 'full' | 'partial' | 'none' => {
+      const octaveNotes = NOTE_NAMES.map(name => `${name}${octave}`);
+      const selectedCount = octaveNotes.filter(k => settings.activeNotes.includes(k)).length;
+      
+      if (selectedCount === 7) return 'full';
+      if (selectedCount > 0) return 'partial';
+      return 'none';
   };
 
   const startGame = () => {
@@ -127,9 +155,7 @@ const App: React.FC = () => {
 
   const nextTurn = useCallback((firstTurn = false) => {
     const newNote = generateRandomNote(
-      settings.clef, 
-      settings.selectedOctaves, 
-      settings.selectedNotes, 
+      settings.activeNotes,
       currentNote || undefined
     );
     setCurrentNote(newNote);
@@ -138,7 +164,7 @@ const App: React.FC = () => {
     setLastCorrectNote(null);
     setLastIncorrectNote(null);
     setStartTime(Date.now());
-  }, [settings.clef, settings.selectedOctaves, settings.selectedNotes, currentNote]);
+  }, [settings.activeNotes, currentNote]);
 
   const handleNoteSelect = (selectedName: NoteName) => {
     if (isProcessing || !currentNote) return;
@@ -246,43 +272,46 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      {/* Octave Selection */}
-      <div className="mb-6">
-        <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-wide">{t.selectOctaves}</label>
-        <div className="flex flex-wrap gap-3 justify-center">
-          {OCTAVE_RANGES[settings.clef].map(octave => (
-            <button
-              key={octave}
-              onClick={() => toggleOctave(octave)}
-              className={`w-12 h-12 rounded-lg font-bold text-lg flex items-center justify-center transition-all ${
-                settings.selectedOctaves.includes(octave)
-                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200 dark:shadow-none scale-105'
-                  : 'bg-white dark:bg-slate-700 border-2 border-slate-200 dark:border-slate-600 text-slate-400 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-500'
-              }`}
-            >
-              {octave}
-            </button>
-          ))}
-        </div>
-        {settings.selectedOctaves.length === 0 && (
-          <p className="text-red-500 text-sm mt-2 text-center">{t.noOctavesSelected}</p>
-        )}
-      </div>
-
-      {/* Note Selection */}
+      {/* Interactive Staff Selection */}
       <div className="mb-8">
         <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-wide">{t.selectNotes}</label>
         
         <InteractiveStaff 
           clef={settings.clef}
-          selectedNotes={settings.selectedNotes}
-          onToggleNote={toggleNote}
+          activeNotes={settings.activeNotes}
+          onToggleNote={toggleSingleNote}
           darkMode={darkMode}
         />
 
-        {settings.selectedNotes.length === 0 && (
+        {settings.activeNotes.length === 0 && (
           <p className="text-red-500 text-sm mt-2 text-center">{t.noNotesSelected}</p>
         )}
+      </div>
+
+      {/* Octave Bulk Selection */}
+      <div className="mb-6">
+        <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-wide">{t.selectOctaves}</label>
+        <div className="flex flex-wrap gap-3 justify-center">
+          {OCTAVE_RANGES[settings.clef].map(octave => {
+            const status = getOctaveStatus(octave);
+            return (
+                <button
+                key={octave}
+                onClick={() => toggleOctaveGroup(octave)}
+                className={`w-12 h-12 rounded-lg font-bold text-lg flex items-center justify-center transition-all border-2 ${
+                    status === 'full'
+                    ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-200 dark:shadow-none scale-105'
+                    : status === 'partial'
+                    ? 'bg-indigo-100 dark:bg-indigo-900/50 border-indigo-400 text-indigo-700 dark:text-indigo-300'
+                    : 'bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-400 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-500'
+                }`}
+                >
+                {octave}
+                </button>
+            );
+          })}
+        </div>
+        <p className="text-xs text-center text-slate-400 mt-2">Use these buttons to select/deselect entire octaves.</p>
       </div>
 
       {/* Tempo Selection */}
@@ -307,7 +336,7 @@ const App: React.FC = () => {
 
       <button
         onClick={startGame}
-        disabled={settings.selectedOctaves.length === 0 || settings.selectedNotes.length === 0}
+        disabled={settings.activeNotes.length === 0}
         className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-bold rounded-xl text-lg shadow-lg shadow-indigo-200 dark:shadow-none transition-transform active:scale-95"
       >
         {t.startSession}
@@ -365,14 +394,6 @@ const App: React.FC = () => {
                 darkMode={darkMode}
                 className="w-full h-full"
             />
-            {/* Range Indicators (Optional visual flair) */}
-            <div className="absolute top-2 right-2 flex flex-col gap-1 items-end">
-                <div className="flex gap-1">
-                  {settings.selectedOctaves.map(o => (
-                      <span key={o} className="text-[10px] bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-400 px-1 rounded border border-slate-200 dark:border-slate-600">{o}</span>
-                  ))}
-                </div>
-            </div>
         </div>
 
         {/* Question Text */}
