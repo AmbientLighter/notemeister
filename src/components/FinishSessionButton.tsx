@@ -24,9 +24,10 @@ const FinishSessionButton: React.FC<FinishSessionButtonProps> = ({ className }) 
       onClick={handleFinish}
       className={
         className ||
-        'px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 rounded-lg text-sm font-semibold transition-colors'
+        'px-6 py-2.5 bg-gradient-to-r from-rose-500 to-indigo-600 hover:from-rose-600 hover:to-indigo-700 text-white rounded-full text-sm font-bold shadow-lg shadow-indigo-200 dark:shadow-none hover:scale-105 active:scale-95 transition-all transform flex items-center gap-2'
       }
     >
+      <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
       {t.finishSession}
     </button>
   );
