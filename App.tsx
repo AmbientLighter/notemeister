@@ -150,6 +150,7 @@ const App: React.FC = () => {
   };
 
   const startGame = () => {
+    audioEngine.init();
     setStats({ correct: 0, total: 0, streak: 0, history: [] });
     setScreen('game');
     nextTurn(true);
