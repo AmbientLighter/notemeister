@@ -2,7 +2,7 @@ import React from 'react';
 import type { NoteName } from '@/types';
 import { useGameStore } from '@/store/useGameStore';
 import { useSessionStore } from '@/store/useSessionStore';
-import { useScrollingStore } from '@/store/useScrollingStore';
+import { useScrollingMode } from '@/hooks/useScrollingMode';
 import StaffCanvas from './StaffCanvas';
 import ScrollingStaffCanvas from './ScrollingStaffCanvas';
 import Keyboard from './Keyboard';
@@ -30,13 +30,13 @@ const GameScreen: React.FC = () => {
   const nextTurn = useSessionStore((state) => state.nextTurn);
 
   // Scrolling State
-  const scrollingNotes = useScrollingStore((state) => state.scrollingNotes);
-  const scrollingFeedback = useScrollingStore((state) => state.feedback);
-  const scrollingLastCorrectNote = useScrollingStore((state) => state.lastCorrectNote);
-  const scrollingLastIncorrectNote = useScrollingStore((state) => state.lastIncorrectNote);
-  const spawnNote = useScrollingStore((state) => state.spawnNote);
-  const updateNotePositions = useScrollingStore((state) => state.updateNotePositions);
-  const hitNote = useScrollingStore((state) => state.hitNote);
+  const {
+    scrollingNotes,
+    hitNote,
+    feedback: scrollingFeedback,
+    lastCorrectNote: scrollingLastCorrectNote,
+    lastIncorrectNote: scrollingLastIncorrectNote,
+  } = useScrollingMode();
 
   // Derived Values based on Mode
   const isScrolling = settings.gameMode === 'scrolling';
@@ -60,44 +60,6 @@ const GameScreen: React.FC = () => {
       nextTurn();
     }
   }, [currentNote, nextTurn, settings.gameMode]);
-
-  // Scrolling Game Loop
-  React.useEffect(() => {
-    if (settings.gameMode !== 'scrolling') return;
-
-    let lastTime = performance.now();
-    let frameId: number;
-
-    const loop = (now: number) => {
-      const deltaTime = now - lastTime;
-      lastTime = now;
-
-      // Update positions
-      // Speed based on tempo: slow=0.01, normal=0.02, fast=0.04 % per ms
-      const speedMap = { slow: 0.01, normal: 0.02, fast: 0.04 };
-      updateNotePositions(deltaTime, speedMap[settings.tempo]);
-
-      // Spawn new note every 2-3 seconds based on tempo
-      const spawnIntervalMap = { slow: 3000, normal: 2000, fast: 1000 };
-      if (
-        Date.now() - useScrollingStore.getState().lastSpawnTime >
-        spawnIntervalMap[settings.tempo]
-      ) {
-        spawnNote();
-      }
-
-      frameId = requestAnimationFrame(loop);
-    };
-
-    frameId = requestAnimationFrame(loop);
-
-    // Initial spawn
-    if (useScrollingStore.getState().scrollingNotes.length === 0) {
-      spawnNote();
-    }
-
-    return () => cancelAnimationFrame(frameId);
-  }, [settings.gameMode, settings.tempo, spawnNote, updateNotePositions]);
 
   const onNoteSelect = (name: NoteName) => {
     if (settings.gameMode === 'scrolling') {
