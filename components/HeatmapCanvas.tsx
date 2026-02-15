@@ -8,13 +8,15 @@ interface NoteStat {
     count: number;
 }
 
+import { useTheme } from '../hooks/useTheme';
+
 interface HeatmapCanvasProps {
     noteStats: NoteStat[];
     clef: 'treble' | 'bass';
-    darkMode: boolean;
 }
 
-const HeatmapCanvas: React.FC<HeatmapCanvasProps> = ({ noteStats, clef, darkMode }) => {
+const HeatmapCanvas: React.FC<HeatmapCanvasProps> = ({ noteStats, clef }) => {
+    const { darkMode } = useTheme();
     const containerRef = useRef<HTMLDivElement>(null);
 
     const getColor = (accuracy: number, avgTime: number) => {

@@ -1,60 +1,35 @@
 import React from 'react';
-import { GameSettings, GameStats, Note, NoteName } from '../types';
+import { useGameStore } from '../store/useGameStore';
+import { useSessionStore } from '../store/useSessionStore';
 import StaffCanvas from './StaffCanvas';
 import Keyboard from './Keyboard';
+import StatsHeader from './StatsHeader';
+import FinishSessionButton from './FinishSessionButton';
+import { useTranslations } from '../hooks/useTranslations';
 
-interface GameScreenProps {
-    settings: GameSettings;
-    stats: GameStats;
-    currentNote: Note | null;
-    feedback: { type: 'correct' | 'incorrect'; message: string } | null;
-    isProcessing: boolean;
-    lastCorrectNote: NoteName | null;
-    lastIncorrectNote: NoteName | null;
-    t: any;
-    darkMode: boolean;
-    handleNoteSelect: (selectedName: NoteName) => void;
-    finishGame: () => void;
-}
+const GameScreen: React.FC = () => {
+    const { t } = useTranslations();
 
-const GameScreen: React.FC<GameScreenProps> = ({
-    settings,
-    stats,
-    currentNote,
-    feedback,
-    isProcessing,
-    lastCorrectNote,
-    lastIncorrectNote,
-    t,
-    darkMode,
-    handleNoteSelect,
-    finishGame
-}) => {
+    // Persisted State
+    const settings = useGameStore((state) => state.settings);
+
+    // Session State
+    const currentNote = useSessionStore((state) => state.currentNote);
+    const feedback = useSessionStore((state) => state.feedback);
+    const isProcessing = useSessionStore((state) => state.isProcessing);
+    const lastCorrectNote = useSessionStore((state) => state.lastCorrectNote);
+    const lastIncorrectNote = useSessionStore((state) => state.lastIncorrectNote);
+    const handleNoteSelect = useSessionStore((state) => state.handleNoteSelect);
+
+    const onNoteSelect = (name: any) => {
+        handleNoteSelect(name, {
+            correctAnswer: t.correctAnswer,
+            incorrectAnswer: t.incorrectAnswer
+        });
+    };
     return (
         <div className="flex flex-col h-full w-full sm:max-w-4xl sm:mx-auto items-center">
-            {/* Header Stats */}
-            <div className="w-full grid grid-cols-3 md:grid-cols-4 gap-4 pt-0 pb-4 px-4 sm:p-6 bg-white dark:bg-slate-800 sm:rounded-b-3xl shadow-sm mb-4 sm:mb-6 transition-colors duration-200">
-                <div className="text-center">
-                    <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{stats.correct}</div>
-                    <div className="text-xs text-slate-500 dark:text-slate-400 uppercase font-semibold">{t.correct}</div>
-                </div>
-                <div className="text-center">
-                    <div className="text-2xl font-bold text-slate-700 dark:text-slate-200">{Math.round((stats.correct / (stats.total || 1)) * 100)}%</div>
-                    <div className="text-xs text-slate-500 dark:text-slate-400 uppercase font-semibold">{t.accuracy}</div>
-                </div>
-                <div className="text-center">
-                    <div className="text-2xl font-bold text-orange-500">{stats.streak}</div>
-                    <div className="text-xs text-slate-500 dark:text-slate-400 uppercase font-semibold">{t.streak}</div>
-                </div>
-                <div className="hidden md:block text-center">
-                    <button
-                        onClick={finishGame}
-                        className="px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 rounded-lg text-sm font-semibold transition-colors"
-                    >
-                        {t.finishSession}
-                    </button>
-                </div>
-            </div>
+            <StatsHeader />
 
             {/* Main Content Area */}
             <div className="flex-1 w-full flex flex-col items-center justify-center p-2 sm:p-4 gap-4 sm:gap-6">
@@ -75,7 +50,6 @@ const GameScreen: React.FC<GameScreenProps> = ({
                     <StaffCanvas
                         clef={settings.clef}
                         note={currentNote}
-                        darkMode={darkMode}
                         className="w-full h-full"
                     />
                 </div>
@@ -85,7 +59,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
 
                 {/* Keyboard */}
                 <Keyboard
-                    onNoteSelect={handleNoteSelect}
+                    onNoteSelect={onNoteSelect}
                     disabled={isProcessing}
                     lastCorrectNote={lastCorrectNote}
                     lastIncorrectNote={lastIncorrectNote}
@@ -94,12 +68,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
 
             {/* Mobile Finish Button */}
             <div className="md:hidden p-4 w-full">
-                <button
-                    onClick={finishGame}
-                    className="w-full py-3 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold sm:rounded-xl"
-                >
-                    {t.finishSession}
-                </button>
+                <FinishSessionButton className="w-full py-3 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold sm:rounded-xl" />
             </div>
         </div>
     );

@@ -42,7 +42,8 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     instrumentSilence: 'Silence',
     instrumentPiano: 'Piano',
     instrumentGuitar: 'Guitar',
-    instrumentFlute: 'Flute'
+    instrumentFlute: 'Flute',
+    performanceAnalysis: 'Performance Analysis'
   },
   ru: {
     title: 'Мастер Нот',
@@ -85,7 +86,8 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     instrumentSilence: 'Без звука',
     instrumentPiano: 'Пианино',
     instrumentGuitar: 'Гитара',
-    instrumentFlute: 'Флейта'
+    instrumentFlute: 'Флейта',
+    performanceAnalysis: 'Анализ исполнения'
   },
   uk: {
     title: 'Майстер Нот',
@@ -128,7 +130,8 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     instrumentSilence: 'Без звуку',
     instrumentPiano: 'Піаніно',
     instrumentGuitar: 'Гітара',
-    instrumentFlute: 'Флейта'
+    instrumentFlute: 'Флейта',
+    performanceAnalysis: 'Аналіз виконання'
   },
   et: {
     title: 'Noodimeister',
@@ -171,7 +174,8 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     instrumentSilence: 'Vaikus',
     instrumentPiano: 'Klaver',
     instrumentGuitar: 'Kitarr',
-    instrumentFlute: 'Flööt'
+    instrumentFlute: 'Flööt',
+    performanceAnalysis: 'Tulemuslikkuse analüüs'
   }
 };
 
@@ -181,3 +185,5 @@ export const OCTAVE_RANGES = {
   treble: [3, 4, 5, 6],
   bass: [1, 2, 3, 4]
 };
+
+export const SUPPORTED_LANGUAGES: Language[] = ['en', 'ru', 'uk', 'et'];

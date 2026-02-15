@@ -3,19 +3,22 @@ import { ClefType, Note } from '../types';
 import { NOTE_NAMES, OCTAVE_RANGES } from '../constants';
 import { getNoteVisualPosition, getNoteKey, parseNoteKey } from '../utils/musicLogic';
 
+import { useTheme } from '../hooks/useTheme';
+
+
+
 interface InteractiveStaffProps {
   clef: ClefType;
   activeNotes: string[];
   onToggleNote: (noteKey: string) => void;
-  darkMode: boolean;
 }
 
 const InteractiveStaff: React.FC<InteractiveStaffProps> = ({
   clef,
   activeNotes,
   onToggleNote,
-  darkMode
 }) => {
+  const { darkMode } = useTheme();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);

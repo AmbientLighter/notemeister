@@ -14,7 +14,6 @@ export interface Note {
 }
 
 export interface GameSettings {
-  language: Language;
   clef: ClefType;
   // activeNotes stores specific notes like "C4", "D5", etc.
   activeNotes: string[];
@@ -78,4 +77,5 @@ export interface Translations {
   instrumentPiano: string;
   instrumentGuitar: string;
   instrumentFlute: string;
+  performanceAnalysis: string;
 }

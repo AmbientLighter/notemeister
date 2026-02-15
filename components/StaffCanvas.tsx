@@ -2,14 +2,16 @@ import React, { useEffect, useRef } from 'react';
 import { Renderer, Stave, StaveNote, Voice, Formatter } from 'vexflow';
 import { ClefType, Note } from '../types';
 
+import { useTheme } from '../hooks/useTheme';
+
 interface StaffCanvasProps {
   clef: ClefType;
   note: Note | null;
-  darkMode?: boolean;
   className?: string;
 }
 
-const StaffCanvas: React.FC<StaffCanvasProps> = ({ clef, note, darkMode = false, className }) => {
+const StaffCanvas: React.FC<StaffCanvasProps> = ({ clef, note, className }) => {
+  const { darkMode } = useTheme();
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
