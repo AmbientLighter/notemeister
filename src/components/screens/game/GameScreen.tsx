@@ -64,6 +64,22 @@ const GameScreen: React.FC = () => {
       stopDetection();
     }
   }, [settings.instrument, isMicActive, stopDetection]);
+
+  // Keyboard Input Support
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (isProcessing || settings.instrument === 'microphone') return;
+
+      const key = e.key.toUpperCase();
+      // Only handle A, B, C, D, E, F, G keys
+      if (/^[A-G]$/.test(key)) {
+        onNoteSelect(key as NoteName);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isProcessing, settings.instrument, onNoteSelect]);
   return (
     <div className="flex flex-col h-full w-full sm:max-w-4xl sm:mx-auto items-center">
       <StatsHeader />
