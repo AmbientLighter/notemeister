@@ -24,7 +24,7 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
         : 0;
 
     return (
-        <div className="bg-white dark:bg-slate-800 p-6 md:p-8 rounded-3xl shadow-xl max-w-xl w-full text-center animate-fade-in my-8 transition-colors duration-200">
+        <div className="bg-white dark:bg-slate-800 p-4 sm:p-6 md:p-8 sm:rounded-3xl shadow-xl sm:max-w-xl w-full text-center animate-fade-in sm:my-8 transition-colors duration-200">
             <h2 className="text-3xl font-bold text-slate-800 dark:text-white mb-2">{t.resultsTitle}</h2>
             <p className="text-slate-500 dark:text-slate-400 mb-8">{t.sessionSummary}</p>
 

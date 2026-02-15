@@ -29,7 +29,7 @@ const SetupScreen: React.FC<SetupScreenProps> = ({
     startGame
 }) => {
     return (
-        <div className="bg-white dark:bg-slate-800 p-6 md:p-10 rounded-3xl shadow-xl max-w-lg w-full animate-fade-in transition-colors duration-200">
+        <div className="bg-white dark:bg-slate-800 p-4 sm:p-6 md:p-10 sm:rounded-3xl shadow-xl sm:max-w-lg w-full animate-fade-in transition-colors duration-200">
             <div className="flex justify-center gap-2 mb-8">
                 {(['en', 'ru', 'uk', 'et'] as Language[]).map(lang => (
                     <button
