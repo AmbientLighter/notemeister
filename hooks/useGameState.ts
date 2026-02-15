@@ -104,6 +104,10 @@ export const useGameState = (settings: GameSettings, t: any) => {
                 nextTurn();
             }, delayCorrect);
         } else {
+            // Haptic Feedback for incorrect answers
+            if (typeof navigator !== 'undefined' && navigator.vibrate) {
+                navigator.vibrate([50]);
+            }
             setFeedback({ type: 'incorrect', message: `${t.incorrectAnswer} ${currentNote.name}` });
             setLastIncorrectNote(selectedName);
             setLastCorrectNote(currentNote.name);
