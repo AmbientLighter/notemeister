@@ -107,4 +107,6 @@ export interface Translations {
   inputModeKeyboard: string;
   inputModeMidi: string;
   inputModeMicrophone: string;
+  showAdvancedSettings: string;
+  hideAdvancedSettings: string;
 }

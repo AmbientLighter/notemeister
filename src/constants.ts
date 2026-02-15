@@ -67,6 +67,8 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     quoteConsistency: 'Consistency is key. Keep playing and your fingers will find the way! ✨',
     reviewProgress: 'Review Progress',
     backToOverview: 'Back to Overview',
+    showAdvancedSettings: 'Show Advanced Settings',
+    hideAdvancedSettings: 'Hide Advanced Settings',
   },
   ru: {
     title: 'Мастер Нот',
@@ -131,6 +133,8 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     quoteConsistency: 'Постоянство — залог успеха. Продолжайте играть! ✨',
     reviewProgress: 'Просмотр прогресса',
     backToOverview: 'Вернуться к обзору',
+    showAdvancedSettings: 'Показать дополнительные настройки',
+    hideAdvancedSettings: 'Скрыть дополнительные настройки',
   },
   uk: {
     title: 'Майстер Нот',
@@ -195,6 +199,8 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     quoteConsistency: 'Постійність — запорука успіху. Продовжуйте грати! ✨',
     reviewProgress: 'Переглянути прогрес',
     backToOverview: 'Повернутися до огляду',
+    showAdvancedSettings: 'Показати додаткові налаштування',
+    hideAdvancedSettings: 'Приховати додаткові налаштування',
   },
   et: {
     title: 'Noodimeister',
@@ -259,6 +265,8 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     quoteConsistency: 'Järjepidevus on võti. Jätka mängimist! ✨',
     reviewProgress: 'Vaata edenemist',
     backToOverview: 'Tagasi ülevaatesse',
+    showAdvancedSettings: 'Näita lisaseadeid',
+    hideAdvancedSettings: 'Peida lisaseaded',
   },
 };
 
