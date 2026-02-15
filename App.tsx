@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { GameSettings, GameStats, Note, NoteName, Language, ClefType } from './types';
+import { GameSettings, GameStats, Note, NoteName, Language, ClefType, Tempo } from './types';
 import { TRANSLATIONS, OCTAVE_RANGES, NOTE_NAMES } from './constants';
 import { generateRandomNote } from './utils/musicLogic';
 import StaffCanvas from './components/StaffCanvas';
@@ -18,7 +18,8 @@ const App: React.FC = () => {
     language: 'en',
     clef: 'treble',
     selectedOctaves: [4, 5], // Default for treble
-    selectedNotes: [...NOTE_NAMES]
+    selectedNotes: [...NOTE_NAMES],
+    tempo: 'normal'
   });
 
   // Game Data
@@ -158,13 +159,25 @@ const App: React.FC = () => {
       }]
     }));
 
+    // Determine delays based on tempo settings
+    let delayCorrect = 300;
+    let delayIncorrect = 1200;
+
+    if (settings.tempo === 'fast') {
+        delayCorrect = 0;
+        delayIncorrect = 500;
+    } else if (settings.tempo === 'slow') {
+        delayCorrect = 1000;
+        delayIncorrect = 2000;
+    }
+
     if (isCorrect) {
       setFeedback({ type: 'correct', message: t.correctAnswer });
       setLastCorrectNote(currentNote.name);
       // Auto advance
       setTimeout(() => {
         nextTurn();
-      }, 300);
+      }, delayCorrect);
     } else {
       setFeedback({ type: 'incorrect', message: `${t.incorrectAnswer} ${currentNote.name}` });
       setLastIncorrectNote(selectedName);
@@ -172,7 +185,7 @@ const App: React.FC = () => {
       // Auto advance slower on error to let them see
       setTimeout(() => {
         nextTurn();
-      }, 1200);
+      }, delayIncorrect);
     }
   };
 
@@ -276,6 +289,26 @@ const App: React.FC = () => {
         {settings.selectedNotes.length === 0 && (
           <p className="text-red-500 text-sm mt-2 text-center">{t.noNotesSelected}</p>
         )}
+      </div>
+
+      {/* Tempo Selection */}
+      <div className="mb-8">
+        <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-wide">{t.selectTempo}</label>
+        <div className="grid grid-cols-3 gap-3">
+            {(['slow', 'normal', 'fast'] as const).map((mode) => (
+                <button
+                    key={mode}
+                    onClick={() => setSettings(s => ({ ...s, tempo: mode }))}
+                    className={`py-3 rounded-xl font-bold transition-all ${
+                        settings.tempo === mode
+                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200 dark:shadow-none'
+                        : 'bg-white dark:bg-slate-700 border-2 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-500'
+                    }`}
+                >
+                    {mode === 'slow' ? t.tempoSlow : mode === 'normal' ? t.tempoNormal : t.tempoFast}
+                </button>
+            ))}
+        </div>
       </div>
 
       <button

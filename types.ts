@@ -1,6 +1,7 @@
 export type Language = 'en' | 'ru' | 'uk' | 'et';
 export type ClefType = 'treble' | 'bass';
 export type NoteName = 'C' | 'D' | 'E' | 'F' | 'G' | 'A' | 'B';
+export type Tempo = 'slow' | 'normal' | 'fast';
 
 export interface Note {
   name: NoteName;
@@ -13,6 +14,7 @@ export interface GameSettings {
   clef: ClefType;
   selectedOctaves: number[];
   selectedNotes: NoteName[];
+  tempo: Tempo;
 }
 
 export interface GameStats {
@@ -37,6 +39,10 @@ export interface Translations {
   selectClef: string;
   selectOctaves: string;
   selectNotes: string;
+  selectTempo: string;
+  tempoSlow: string;
+  tempoNormal: string;
+  tempoFast: string;
   startSession: string;
   correct: string;
   total: string;
