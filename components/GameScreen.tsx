@@ -33,7 +33,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
     return (
         <div className="flex flex-col h-full w-full sm:max-w-4xl sm:mx-auto items-center">
             {/* Header Stats */}
-            <div className="w-full grid grid-cols-3 md:grid-cols-4 gap-4 p-4 md:p-6 bg-white dark:bg-slate-800 sm:rounded-b-3xl shadow-sm mb-4 sm:mb-6 transition-colors duration-200">
+            <div className="w-full grid grid-cols-3 md:grid-cols-4 gap-4 pt-0 pb-4 px-4 sm:p-6 bg-white dark:bg-slate-800 sm:rounded-b-3xl shadow-sm mb-4 sm:mb-6 transition-colors duration-200">
                 <div className="text-center">
                     <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{stats.correct}</div>
                     <div className="text-xs text-slate-500 dark:text-slate-400 uppercase font-semibold">{t.correct}</div>
