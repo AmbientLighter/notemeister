@@ -6,6 +6,7 @@ import HeatmapCanvas from './HeatmapCanvas';
 import DetailedStats from './DetailedStats';
 import SummaryGrid from './SummaryGrid';
 import FloatingNotes from './FloatingNotes';
+import { audioEngine } from '../utils/audio';
 
 const ResultsScreen: React.FC = () => {
     const { t } = useTranslations();
@@ -60,6 +61,16 @@ const ResultsScreen: React.FC = () => {
         if (overallAccuracy >= 50) return t.feedbackGettingThere;
         return t.feedbackKeepPracticing;
     }, [overallAccuracy, t]);
+
+    const hasPlayedAudio = React.useRef(false);
+
+    React.useEffect(() => {
+        if (!hasPlayedAudio.current && overallAccuracy > 0) {
+            const type = overallAccuracy >= 80 ? 'success' : 'failure';
+            audioEngine.playMelody(type, settings.instrument);
+            hasPlayedAudio.current = true;
+        }
+    }, [overallAccuracy, settings.instrument]);
 
     return (
         <>
