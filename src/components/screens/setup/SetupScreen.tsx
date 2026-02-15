@@ -29,6 +29,7 @@ const SetupScreen: React.FC = () => {
 
       {/* Interactive Staff Selection */}
       <div className="mb-10">
+        <OctaveSelector />
         <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-4 uppercase tracking-widest">
           {t.selectNotes}
         </label>
@@ -66,7 +67,6 @@ const SetupScreen: React.FC = () => {
           <div className="mt-6 space-y-8 p-6 rounded-[2rem] bg-slate-50/50 dark:bg-slate-900/30 border border-slate-100 dark:border-slate-800 animate-in fade-in slide-in-from-top-2 duration-300">
             <LanguagePicker />
             <ClefSelector />
-            <OctaveSelector />
             <TempoSelector />
             <InputMethodSelector />
             <InstrumentSelector />

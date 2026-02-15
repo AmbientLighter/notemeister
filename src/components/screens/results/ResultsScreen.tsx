@@ -54,7 +54,7 @@ const ResultsScreen: React.FC = () => {
   }, [stats.history, noteStats]);
 
   const feedbackText = React.useMemo(() => {
-    if (overallAccuracy >= 95) return t.feedbackMastery;
+    if (overallAccuracy == 100) return t.feedbackMastery;
     if (overallAccuracy >= 85) return t.feedbackExemplary;
     if (overallAccuracy >= 70) return t.feedbackProgress;
     if (overallAccuracy >= 50) return t.feedbackGettingThere;
