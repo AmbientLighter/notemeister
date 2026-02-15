@@ -1,20 +1,69 @@
+# NoteMeister
+
+Notemeister is a small interactive music-learning web app built with React, TypeScript and Vite. It displays a musical staff and an on-screen keyboard so users can practice identifying notes, hear pitches, and interact with notation in real time.
+
+This README explains how to run, build and contribute to the project, describes the main components and outlines how to extend the app.
+
+## Screenshots
+
 <div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+  <img src="./assets/settings.png" alt="Settings" width="600" />
+  <p><em>Configuration and settings</em></p>
+  
+  <img src="./assets/main.png" alt="Main Interface" width="600" />
+  <p><em>Main identification interface</em></p>
+  
+  <img src="./assets/stats.png" alt="Statistics" width="600" />
+  <p><em>Progress tracking and statistics</em></p>
 </div>
 
-# Run and deploy your AI Studio app
+## Features
 
-This contains everything you need to run your app locally.
+- Interactive staff display with clickable notes and canvas rendering
+- Lightweight, dependency-minimal front-end using Vite + React + TypeScript
 
-View your app in AI Studio: https://ai.studio/apps/drive/1t__Qn1U2jrq3kD0N7dLD3ShbvniGzsUh
+## Tech stack
 
-## Run Locally
+- Framework: React
+- Language: TypeScript
+- Bundler / dev server: Vite
 
-**Prerequisites:**  Node.js
+## Quick demo (local)
 
+1. Install dependencies: `npm install`
+2. Start dev server: `npm run dev`
+3. Open the URL printed by Vite (usually `http://localhost:5173`)
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## Getting started
+
+Prerequisites
+
+- Node.js
+
+Install
+
+```bash
+npm install
+```
+
+Run (development)
+
+```bash
+npm run dev
+```
+
+Build for production
+
+```bash
+npm run build
+```
+
+Preview production build locally
+
+```bash
+npm run preview
+```
+
+## License
+
+This project is provided under the MIT License.
