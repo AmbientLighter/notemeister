@@ -69,6 +69,10 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     backToOverview: 'Back to Overview',
     showAdvancedSettings: 'Show Advanced Settings',
     hideAdvancedSettings: 'Hide Advanced Settings',
+    selectTheme: 'Select Appearance',
+    themeLight: 'Light',
+    themeDark: 'Dark',
+    themeSystem: 'System',
   },
   ru: {
     title: 'Мастер Нот',
@@ -135,6 +139,10 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     backToOverview: 'Вернуться к обзору',
     showAdvancedSettings: 'Показать дополнительные настройки',
     hideAdvancedSettings: 'Скрыть дополнительные настройки',
+    selectTheme: 'Выберите оформление',
+    themeLight: 'Светлое',
+    themeDark: 'Темное',
+    themeSystem: 'Системное',
   },
   uk: {
     title: 'Майстер Нот',
@@ -201,6 +209,10 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     backToOverview: 'Повернутися до огляду',
     showAdvancedSettings: 'Показати додаткові налаштування',
     hideAdvancedSettings: 'Приховати додаткові налаштування',
+    selectTheme: 'Оберіть оформлення',
+    themeLight: 'Світле',
+    themeDark: 'Темне',
+    themeSystem: 'Системне',
   },
   et: {
     title: 'Noodimeister',
@@ -267,6 +279,10 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     backToOverview: 'Tagasi ülevaatesse',
     showAdvancedSettings: 'Näita lisaseadeid',
     hideAdvancedSettings: 'Peida lisaseaded',
+    selectTheme: 'Vali välimus',
+    themeLight: 'Hele',
+    themeDark: 'Tume',
+    themeSystem: 'Süsteemne',
   },
 };
 

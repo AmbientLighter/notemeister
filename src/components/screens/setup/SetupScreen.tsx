@@ -9,6 +9,7 @@ import LanguagePicker from './LanguagePicker';
 import OctaveSelector from './OctaveSelector';
 import TempoSelector from './TempoSelector';
 import InputMethodSelector from './InputMethodSelector';
+import ThemeSelector from './ThemeSelector';
 import { ChevronDown, ChevronUp, Settings2 } from 'lucide-react';
 
 const SetupScreen: React.FC = () => {
@@ -69,6 +70,7 @@ const SetupScreen: React.FC = () => {
             <ClefSelector />
             <TempoSelector />
             <InputMethodSelector />
+            <ThemeSelector />
             <InstrumentSelector />
           </div>
         )}

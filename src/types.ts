@@ -4,6 +4,7 @@ export type NoteName = 'C' | 'D' | 'E' | 'F' | 'G' | 'A' | 'B';
 export type Tempo = 'slow' | 'normal' | 'fast';
 export type Instrument = 'silence' | 'piano' | 'guitar' | 'flute';
 export type InputMode = 'keyboard' | 'midi' | 'microphone';
+export type AppTheme = 'light' | 'dark' | 'system';
 
 export type Screen = 'setup' | 'game' | 'results';
 export type SortMethod = 'difficulty' | 'name' | 'time';
@@ -109,4 +110,8 @@ export interface Translations {
   inputModeMicrophone: string;
   showAdvancedSettings: string;
   hideAdvancedSettings: string;
+  selectTheme: string;
+  themeLight: string;
+  themeDark: string;
+  themeSystem: string;
 }
