@@ -2,7 +2,8 @@ export type Language = 'en' | 'ru' | 'uk' | 'et';
 export type ClefType = 'treble' | 'bass';
 export type NoteName = 'C' | 'D' | 'E' | 'F' | 'G' | 'A' | 'B';
 export type Tempo = 'slow' | 'normal' | 'fast';
-export type Instrument = 'silence' | 'piano' | 'guitar' | 'flute' | 'microphone';
+export type Instrument = 'silence' | 'piano' | 'guitar' | 'flute';
+export type InputMode = 'keyboard' | 'midi' | 'microphone';
 
 export type Screen = 'setup' | 'game' | 'results';
 export type SortMethod = 'difficulty' | 'name' | 'time';
@@ -26,6 +27,7 @@ export interface GameSettings {
   activeNotes: string[];
   tempo: Tempo;
   instrument: Instrument;
+  inputMode: InputMode;
 }
 
 export interface GameStats {
@@ -84,7 +86,6 @@ export interface Translations {
   instrumentPiano: string;
   instrumentGuitar: string;
   instrumentFlute: string;
-  instrumentMicrophone: string;
   micAccessRequired: string;
   performanceAnalysis: string;
   concealDetails: string;
@@ -102,4 +103,8 @@ export interface Translations {
   backToOverview: string;
   playOrSing: string;
   playThisNote: string;
+  selectInputMode: string;
+  inputModeKeyboard: string;
+  inputModeMidi: string;
+  inputModeMicrophone: string;
 }

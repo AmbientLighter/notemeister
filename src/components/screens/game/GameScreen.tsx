@@ -50,26 +50,26 @@ const GameScreen: React.FC = () => {
 
   // Auto-advance if detected note matches current note
   React.useEffect(() => {
-    if (settings.instrument === 'microphone' && isMicActive && !isProcessing && currentNote) {
+    if (settings.inputMode === 'microphone' && isMicActive && !isProcessing && currentNote) {
       const targetKey = `${currentNote.name}${currentNote.octave}`;
       if (detectedNote === targetKey) {
         resetNote();
         onNoteSelect(currentNote.name);
       }
     }
-  }, [detectedNote, isMicActive, isProcessing, currentNote, settings.instrument]);
+  }, [detectedNote, isMicActive, isProcessing, currentNote, settings.inputMode]);
 
   // Handle clean up or auto-start (optional, usually needs user gesture)
   React.useEffect(() => {
-    if (settings.instrument !== 'microphone' && isMicActive) {
+    if (settings.inputMode !== 'microphone' && isMicActive) {
       stopDetection();
     }
-  }, [settings.instrument, isMicActive, stopDetection]);
+  }, [settings.inputMode, isMicActive, stopDetection]);
 
   // Keyboard Input Support
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (isProcessing || settings.instrument === 'microphone') return;
+      if (isProcessing || settings.inputMode !== 'keyboard') return;
 
       const key = e.key.toUpperCase();
       // Only handle A, B, C, D, E, F, G keys
@@ -80,13 +80,13 @@ const GameScreen: React.FC = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isProcessing, settings.instrument, onNoteSelect]);
+  }, [isProcessing, settings.inputMode, onNoteSelect]);
 
   // MIDI Input Support
-  useMidi((name, octave) => {
+  useMidi((name, _octave) => {
     if (isProcessing) return;
     onNoteSelect(name);
-  });
+  }, settings.inputMode === 'midi');
   return (
     <div className="flex flex-col h-full w-full sm:max-w-4xl sm:mx-auto items-center">
       <StatsHeader />
@@ -114,7 +114,7 @@ const GameScreen: React.FC = () => {
           <StaffCanvas clef={settings.clef} note={currentNote} className="w-full h-full" />
 
           {/* Microphone Status Overlay */}
-          {settings.instrument === 'microphone' && (
+          {settings.inputMode === 'microphone' && (
             <MicStatusOverlay
               isActive={isMicActive}
               detectedNote={detectedNote}
@@ -126,13 +126,13 @@ const GameScreen: React.FC = () => {
 
         {/* Question Text */}
         <p className="text-slate-400 dark:text-slate-500 font-medium text-lg">
-          {settings.instrument === 'microphone' && isMicActive && currentNote
+          {settings.inputMode === 'microphone' && isMicActive && currentNote
             ? t.playThisNote
             : t.question}
         </p>
 
         {/* Keyboard */}
-        {settings.instrument !== 'microphone' && (
+        {settings.inputMode !== 'microphone' && (
           <Keyboard
             onNoteSelect={onNoteSelect}
             disabled={isProcessing}

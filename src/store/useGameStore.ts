@@ -28,6 +28,7 @@ const DEFAULT_SETTINGS: GameSettings = {
   activeNotes: NOTE_NAMES.map((name) => `${name}4`),
   tempo: 'normal',
   instrument: 'piano',
+  inputMode: 'keyboard',
 };
 
 export const useGameStore = create<GameState>()(

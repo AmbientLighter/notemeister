@@ -9,7 +9,7 @@ interface MidiMessage {
 
 const MIDI_NOTE_NAMES: string[] = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
-export const useMidi = (onNoteOn: (name: NoteName, octave: number) => void) => {
+export const useMidi = (onNoteOn: (name: NoteName, octave: number) => void, enabled: boolean) => {
   const handleMidiMessage = useCallback(
     (event: WebMidi.MIDIMessageEvent) => {
       const [command, note, velocity] = event.data;
@@ -32,6 +32,8 @@ export const useMidi = (onNoteOn: (name: NoteName, octave: number) => void) => {
   );
 
   useEffect(() => {
+    if (!enabled) return;
+
     if (!navigator.requestMIDIAccess) {
       console.warn('Web MIDI API is not supported in this browser.');
       return;
@@ -66,5 +68,5 @@ export const useMidi = (onNoteOn: (name: NoteName, octave: number) => void) => {
         midiAccess.onstatechange = null;
       }
     };
-  }, [handleMidiMessage]);
+  }, [handleMidiMessage, enabled]);
 };

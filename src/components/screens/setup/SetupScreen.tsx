@@ -8,6 +8,7 @@ import InteractiveStaff from './InteractiveStaff';
 import LanguagePicker from './LanguagePicker';
 import OctaveSelector from './OctaveSelector';
 import TempoSelector from './TempoSelector';
+import InputMethodSelector from './InputMethodSelector';
 
 const SetupScreen: React.FC = () => {
   const { t } = useTranslations();
@@ -47,6 +48,7 @@ const SetupScreen: React.FC = () => {
 
       <OctaveSelector />
       <TempoSelector />
+      <InputMethodSelector />
       <InstrumentSelector />
 
       <button
