@@ -38,6 +38,7 @@ export interface GameSettings {
   instrument: Instrument;
   inputMode: InputMode;
   gameMode: GameMode;
+  selectedSongId: string | null;
 }
 
 export interface GameStats {
@@ -129,4 +130,17 @@ export interface Translations {
   modeStandard: string;
   modeScrolling: string;
   missed: string;
+  selectSong: string;
+  songRandom: string;
+}
+
+export interface SongNote {
+  note: Note;
+  timeOffset: number; // Milliseconds from the start of the song
+}
+
+export interface Song {
+  id: string;
+  name: string;
+  notes: SongNote[];
 }

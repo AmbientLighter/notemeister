@@ -1,8 +1,9 @@
 import { create } from 'zustand';
-import type { Note, NoteName, ScrollingNote } from '@/types';
+import type { Note, NoteName, ScrollingNote, Song } from '@/types';
 import { generateRandomNote } from '@/utils/musicLogic';
 import { audioEngine } from '@/utils/audio';
 import { useGameStore } from './useGameStore';
+import { SONGS } from '@/data/songs';
 
 interface ScrollingState {
   scrollingNotes: ScrollingNote[];
@@ -12,6 +13,9 @@ interface ScrollingState {
   lastCorrectNote: NoteName | null;
   lastIncorrectNote: NoteName | null;
   isPaused: boolean;
+  activeSong: Song | null;
+  songCurrentNoteIndex: number;
+  startTime: number;
 
   // Actions
   startGame: () => void;
@@ -33,6 +37,9 @@ export const useScrollingStore = create<ScrollingState>((set, get) => ({
   lastCorrectNote: null,
   lastIncorrectNote: null,
   isPaused: false,
+  activeSong: null,
+  songCurrentNoteIndex: 0,
+  startTime: 0,
 
   resetSession: () =>
     set({
@@ -43,25 +50,47 @@ export const useScrollingStore = create<ScrollingState>((set, get) => ({
       lastCorrectNote: null,
       lastIncorrectNote: null,
       isPaused: false,
+      activeSong: null,
+      songCurrentNoteIndex: 0,
+      startTime: 0,
     }),
 
   setPaused: (paused) => set({ isPaused: paused }),
 
   startGame: () => {
     audioEngine.init();
-    const { resetStats, setScreen } = useGameStore.getState();
+    const { settings, resetStats, setScreen } = useGameStore.getState();
     resetStats();
     setScreen('game');
     get().resetSession();
-    get().spawnNote();
+
+    const selectedSong = settings.selectedSongId
+      ? SONGS.find((s) => s.id === settings.selectedSongId) || null
+      : null;
+
+    set({ activeSong: selectedSong, startTime: Date.now() });
+
+    if (!selectedSong) {
+      get().spawnNote();
+    }
   },
 
   spawnNote: () => {
     const { settings } = useGameStore.getState();
-    const { scrollingNotes } = get();
-    const lastNote =
-      scrollingNotes.length > 0 ? scrollingNotes[scrollingNotes.length - 1].note : undefined;
-    const newNote = generateRandomNote(settings.activeNotes, lastNote);
+    const { scrollingNotes, activeSong, songCurrentNoteIndex } = get();
+
+    let newNote: Note | undefined;
+
+    if (activeSong) {
+      if (songCurrentNoteIndex < activeSong.notes.length) {
+        newNote = activeSong.notes[songCurrentNoteIndex].note;
+        set({ songCurrentNoteIndex: songCurrentNoteIndex + 1 });
+      }
+    } else {
+      const lastNote =
+        scrollingNotes.length > 0 ? scrollingNotes[scrollingNotes.length - 1].note : undefined;
+      newNote = generateRandomNote(settings.activeNotes, lastNote);
+    }
 
     if (newNote) {
       const newNode = {

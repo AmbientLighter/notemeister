@@ -1,0 +1,85 @@
+import { Song, NoteName } from '@/types';
+
+// Helper to create a note object
+const n = (name: NoteName, octave: number) => ({
+  name,
+  octave,
+  absoluteIndex: octave * 7 + ['C', 'D', 'E', 'F', 'G', 'A', 'B'].indexOf(name),
+});
+
+export const SONGS: Song[] = [
+  {
+    id: 'c-major-scale',
+    name: 'C Major Scale',
+    notes: [
+      { note: n('C', 4), timeOffset: 0 },
+      { note: n('D', 4), timeOffset: 2000 },
+      { note: n('E', 4), timeOffset: 4000 },
+      { note: n('F', 4), timeOffset: 6000 },
+      { note: n('G', 4), timeOffset: 8000 },
+      { note: n('A', 4), timeOffset: 10000 },
+      { note: n('B', 4), timeOffset: 12000 },
+      { note: n('C', 5), timeOffset: 14000 },
+    ],
+  },
+  {
+    id: 'twinkle-twinkle',
+    name: 'Twinkle Twinkle',
+    notes: [
+      { note: n('C', 4), timeOffset: 0 },
+      { note: n('C', 4), timeOffset: 1000 },
+      { note: n('G', 4), timeOffset: 2000 },
+      { note: n('G', 4), timeOffset: 3000 },
+      { note: n('A', 4), timeOffset: 4000 },
+      { note: n('A', 4), timeOffset: 5000 },
+      { note: n('G', 4), timeOffset: 6000 },
+      { note: n('F', 4), timeOffset: 8000 },
+      { note: n('F', 4), timeOffset: 9000 },
+      { note: n('E', 4), timeOffset: 10000 },
+      { note: n('E', 4), timeOffset: 11000 },
+      { note: n('D', 4), timeOffset: 12000 },
+      { note: n('D', 4), timeOffset: 13000 },
+      { note: n('C', 4), timeOffset: 14000 },
+    ],
+  },
+  {
+    id: 'ode-to-joy',
+    name: 'Ode to Joy',
+    notes: [
+      { note: n('E', 4), timeOffset: 0 },
+      { note: n('E', 4), timeOffset: 1000 },
+      { note: n('F', 4), timeOffset: 2000 },
+      { note: n('G', 4), timeOffset: 3000 },
+      { note: n('G', 4), timeOffset: 4000 },
+      { note: n('F', 4), timeOffset: 5000 },
+      { note: n('E', 4), timeOffset: 6000 },
+      { note: n('D', 4), timeOffset: 7000 },
+      { note: n('C', 4), timeOffset: 8000 },
+      { note: n('C', 4), timeOffset: 9000 },
+      { note: n('D', 4), timeOffset: 10000 },
+      { note: n('E', 4), timeOffset: 11000 },
+      { note: n('E', 4), timeOffset: 12000 },
+      { note: n('D', 4), timeOffset: 13000 },
+      { note: n('D', 4), timeOffset: 14000 },
+    ],
+  },
+  {
+    id: 'mary-had-a-little-lamb',
+    name: 'Mary Had a Little Lamb',
+    notes: [
+      { note: n('E', 4), timeOffset: 0 },
+      { note: n('D', 4), timeOffset: 1000 },
+      { note: n('C', 4), timeOffset: 2000 },
+      { note: n('D', 4), timeOffset: 3000 },
+      { note: n('E', 4), timeOffset: 4000 },
+      { note: n('E', 4), timeOffset: 5000 },
+      { note: n('E', 4), timeOffset: 6000 },
+      { note: n('D', 4), timeOffset: 7000 },
+      { note: n('D', 4), timeOffset: 8000 },
+      { note: n('D', 4), timeOffset: 9000 },
+      { note: n('E', 4), timeOffset: 10000 },
+      { note: n('G', 4), timeOffset: 11000 },
+      { note: n('G', 4), timeOffset: 12000 },
+    ],
+  },
+];

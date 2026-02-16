@@ -10,6 +10,7 @@ import LanguagePicker from './LanguagePicker';
 import OctaveSelector from './OctaveSelector';
 import TempoSelector from './TempoSelector';
 import ModeSelector from './ModeSelector';
+import SongSelector from './SongSelector';
 import InputMethodSelector from './InputMethodSelector';
 import ThemeSelector from './ThemeSelector';
 import { ChevronDown, ChevronUp, Settings2 } from 'lucide-react';
@@ -75,6 +76,7 @@ const SetupScreen: React.FC = () => {
             <ThemeSelector />
             <LanguagePicker />
             <ModeSelector />
+            {settings.gameMode === 'scrolling' && <SongSelector />}
             <ClefSelector />
             <TempoSelector />
             <InputMethodSelector />

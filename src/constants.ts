@@ -79,6 +79,8 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     modeStandard: 'Classic',
     modeScrolling: 'Scrolling Staff',
     missed: 'Missed',
+    selectSong: 'Select Song',
+    songRandom: 'Random (Infinite)',
   },
   ru: {
     title: 'Мастер Нот',
@@ -155,6 +157,8 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     modeStandard: 'Классика',
     modeScrolling: 'Бегущий стан',
     missed: 'Пропущено',
+    selectSong: 'Выберите песню',
+    songRandom: 'Случайные ноты',
   },
   uk: {
     title: 'Майстер Нот',
@@ -231,6 +235,8 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     modeStandard: 'Класика',
     modeScrolling: 'Біжучий стан',
     missed: 'Пропущено',
+    selectSong: 'Оберіть пісню',
+    songRandom: 'Випадкові ноти',
   },
   et: {
     title: 'Noodimeister',
@@ -307,6 +313,8 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     modeStandard: 'Klassikaline',
     modeScrolling: 'Jooksev noodijoonestik',
     missed: 'Vahele jäänud',
+    selectSong: 'Vali laul',
+    songRandom: 'Lõpmatu harjutus',
   },
 };
 

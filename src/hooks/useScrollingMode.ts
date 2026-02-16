@@ -26,16 +26,25 @@ export const useScrollingMode = () => {
       const deltaTime = now - lastTime;
       lastTime = now;
 
-      if (!useScrollingStore.getState().isPaused) {
+      const storeState = useScrollingStore.getState();
+
+      if (!storeState.isPaused) {
         const speedMap = { slow: 0.01, normal: 0.02, fast: 0.04 };
         updateNotePositions(deltaTime, speedMap[settings.tempo]);
 
-        const spawnIntervalMap = { slow: 3000, normal: 2000, fast: 1000 };
-        if (
-          Date.now() - useScrollingStore.getState().lastSpawnTime >
-          spawnIntervalMap[settings.tempo]
-        ) {
-          spawnNote();
+        if (storeState.activeSong) {
+          // Song mode: spawn based on timeOffset
+          const songTime = Date.now() - storeState.startTime;
+          const nextNote = storeState.activeSong.notes[storeState.songCurrentNoteIndex];
+          if (nextNote && songTime >= nextNote.timeOffset) {
+            spawnNote();
+          }
+        } else {
+          // Random mode: spawn based on intervals
+          const spawnIntervalMap = { slow: 3000, normal: 2000, fast: 1000 };
+          if (Date.now() - storeState.lastSpawnTime > spawnIntervalMap[settings.tempo]) {
+            spawnNote();
+          }
         }
       }
 
