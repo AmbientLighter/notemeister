@@ -103,7 +103,7 @@ export const useScrollingStore = create<ScrollingState>((set, get) => ({
     }
   },
 
-  updateNotePositions: (deltaTime, speed) => {
+  updateNotePositions: (deltaTime: number, speed: number) => {
     const { scrollingNotes, missedNotes } = get();
     const { recordTurn } = useGameStore.getState();
 
@@ -120,6 +120,18 @@ export const useScrollingStore = create<ScrollingState>((set, get) => ({
       });
 
     set({ scrollingNotes: updatedNotes, missedNotes: newMissed });
+
+    // Auto-finish song if all notes are processed
+    const activeSong = get().activeSong;
+    if (
+      activeSong &&
+      get().songCurrentNoteIndex >= activeSong.notes.length &&
+      updatedNotes.length === 0
+    ) {
+      setTimeout(() => {
+        useGameStore.getState().setScreen('results');
+      }, 1500); // Small delay for the last note feedback
+    }
   },
 
   hitNote: (selectedName, t) => {
@@ -138,12 +150,25 @@ export const useScrollingStore = create<ScrollingState>((set, get) => ({
 
     if (isCorrect) {
       audioEngine.playNote(targetNode.note, settings.instrument);
+      const remainingNotes = scrollingNotes.filter((n) => n.id !== targetNode.id);
       set({
-        scrollingNotes: scrollingNotes.filter((n) => n.id !== targetNode.id),
+        scrollingNotes: remainingNotes,
         lastCorrectNote: targetNode.note.name,
         feedback: { type: 'correct', message: t.correctAnswer },
       });
       setTimeout(() => set({ feedback: null }), 500);
+
+      // Auto-finish song if all notes are processed
+      const activeSong = get().activeSong;
+      if (
+        activeSong &&
+        get().songCurrentNoteIndex >= activeSong.notes.length &&
+        remainingNotes.length === 0
+      ) {
+        setTimeout(() => {
+          useGameStore.getState().setScreen('results');
+        }, 1500);
+      }
     } else {
       set({
         lastIncorrectNote: selectedName,
