@@ -28,13 +28,47 @@ const PianoKeyboard: React.FC<PianoKeyboardProps> = ({
     return notes;
   }, [externalActiveNotes, demoActiveNote]);
 
-  // Define keys for approximately 2 octaves (matching typical staff range)
-  // C3 to B4
+  // Determine the relevant octave range based on current context
+  const targetOctaves = useMemo(() => {
+    const usedOctaves = new Set<number>();
+
+    if (settings.gameMode === 'standard') {
+      const currentNote = useGameStore.getState().settings.activeNotes; // Simplified: check what's enabled
+      currentNote.forEach((n) => {
+        const octave = parseInt(n.replace(/^\D+/g, ''), 10);
+        if (!isNaN(octave)) usedOctaves.add(octave);
+      });
+    } else {
+      const activeSong = useScrollingStore.getState().activeSong;
+      if (activeSong) {
+        activeSong.notes.forEach((sn) => usedOctaves.add(sn.note.octave));
+      } else {
+        settings.activeNotes.forEach((n) => {
+          const octave = parseInt(n.replace(/^\D+/g, ''), 10);
+          if (!isNaN(octave)) usedOctaves.add(octave);
+        });
+      }
+    }
+
+    if (usedOctaves.size === 0) return [3, 4]; // Default
+
+    const min = Math.min(...usedOctaves);
+    const max = Math.max(...usedOctaves);
+
+    // Ensure at least a small range for visual balance
+    const range = [];
+    for (let i = min; i <= max; i++) {
+      range.push(i);
+    }
+    return range;
+  }, [settings.gameMode, settings.activeNotes]);
+
+  // Define keys based on calculated octaves
   const keys = useMemo(() => {
     const noteNames: NoteName[] = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
     const allKeys: { name: NoteName; octave: number; isBlack: boolean }[] = [];
 
-    [3, 4].forEach((octave) => {
+    targetOctaves.forEach((octave) => {
       noteNames.forEach((name) => {
         allKeys.push({ name, octave, isBlack: false });
         // Add black keys after C, D, F, G, A
@@ -45,7 +79,7 @@ const PianoKeyboard: React.FC<PianoKeyboardProps> = ({
     });
 
     return allKeys;
-  }, []);
+  }, [targetOctaves]);
 
   const handleKeyPress = (name: NoteName, octave: number) => {
     audioEngine.playNote({ name, octave, absoluteIndex: 0 }, instrument);
