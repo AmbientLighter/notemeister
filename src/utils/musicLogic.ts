@@ -81,6 +81,20 @@ const CHROMATIC_TO_NATURAL_MAP: Record<number, string> = {
   11: 'B',
 };
 
+const DURATION_MAP: Record<string, number> = {
+  w: 4, // whole
+  h: 2, // half
+  q: 1, // quarter
+  '8': 0.5, // eighth
+  '16': 0.25, // sixteenth
+  '32': 0.125, // thirty-second
+};
+
+export const getDurationMs = (duration: string, bpm: number): number => {
+  const beats = DURATION_MAP[duration.replace(/r$/, '')] || 1;
+  return (60000 / bpm) * beats;
+};
+
 /**
  * Converts a frequency (Hz) to a musical note name and octave.
  * Filter out obviously incorrect or extreme frequencies before calling.

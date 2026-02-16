@@ -19,9 +19,11 @@ const PianoKeyboard: React.FC<PianoKeyboardProps> = ({
 
   // Combine external active notes with demo active note
   const activeNotes = useMemo(() => {
-    const notes: { name: NoteName; octave?: number }[] = (externalActiveNotes || []).map((n) => ({
-      name: n as NoteName,
-    }));
+    const notes: { name: NoteName; octave?: number }[] = (externalActiveNotes || []).map((n) => {
+      const name = n.replace(/[0-9]/g, '') as NoteName;
+      const octave = parseInt(n.replace(/^\D+/g, ''), 10);
+      return { name, octave: isNaN(octave) ? undefined : octave };
+    });
     if (demoActiveNote) {
       notes.push({ name: demoActiveNote.name, octave: demoActiveNote.octave });
     }
@@ -61,7 +63,7 @@ const PianoKeyboard: React.FC<PianoKeyboardProps> = ({
       range.push(i);
     }
     return range;
-  }, [settings.gameMode, settings.activeNotes]);
+  }, [settings.gameMode, settings.activeNotes, useScrollingStore((state) => state.activeSong)]);
 
   // Define keys based on calculated octaves
   const keys = useMemo(() => {
@@ -98,20 +100,21 @@ const PianoKeyboard: React.FC<PianoKeyboardProps> = ({
               relative transition-all duration-75 active:scale-95
               ${
                 key.isBlack
-                  ? 'bg-slate-800 dark:bg-black w-8 h-28 -mx-4 z-10 rounded-b-md shadow-lg border-x border-slate-700/50 hover:bg-slate-700 pointer-events-auto'
-                  : 'bg-white dark:bg-slate-100 w-12 h-48 border border-slate-200 dark:border-slate-300 rounded-b-xl shadow-md hover:bg-slate-50 z-0'
+                  ? 'w-8 h-28 -mx-4 z-10 rounded-b-md shadow-lg border-x border-slate-700/50 hover:bg-slate-700 pointer-events-auto'
+                  : 'w-12 h-48 border border-slate-200 dark:border-slate-300 rounded-b-xl shadow-md hover:bg-slate-50 z-0'
               }
-               ${
-                 activeNotes.some(
-                   (n) => n.name === key.name && (n.octave === undefined || n.octave === key.octave)
-                 )
-                   ? key.isBlack
-                     ? 'bg-indigo-600 dark:bg-indigo-500 shadow-indigo-200/50'
-                     : 'bg-indigo-100 dark:bg-indigo-200 border-indigo-300'
-                   : key.isBlack
-                     ? 'active:bg-slate-600'
-                     : 'active:bg-indigo-50'
-               }
+              ${
+                activeNotes.some(
+                  (n) =>
+                    !key.isBlack &&
+                    n.name === key.name &&
+                    (n.octave === undefined || n.octave === key.octave)
+                )
+                  ? 'bg-indigo-500 dark:bg-indigo-400 text-white scale-95 shadow-indigo-300/50'
+                  : key.isBlack
+                    ? 'bg-slate-800 dark:bg-black active:bg-slate-600'
+                    : 'bg-white dark:bg-slate-100 active:bg-indigo-50'
+              }
               flex items-end justify-center pb-4
             `}
             style={key.isBlack ? { marginLeft: '-1rem', marginRight: '-1rem' } : {}}

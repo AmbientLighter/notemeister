@@ -54,8 +54,8 @@ const ScrollingStaffCanvas: React.FC<ScrollingStaffCanvasProps> = ({ clef, notes
 
       const vexNote = new StaveNote({
         clef: clef,
-        keys: [`${sn.note.name}/${sn.note.octave}`],
-        duration: 'q',
+        keys: sn.keys,
+        duration: sn.duration,
       });
       vexNote.setStyle({ fillStyle: noteColor, strokeStyle: noteColor });
 

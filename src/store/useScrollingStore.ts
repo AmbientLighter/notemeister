@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { Note, NoteName, ScrollingNote, Song } from '@/types';
-import { generateRandomNote } from '@/utils/musicLogic';
+import { generateRandomNote, getDurationMs } from '@/utils/musicLogic';
 import { audioEngine } from '@/utils/audio';
 import { useGameStore } from './useGameStore';
 import { SONGS } from '@/data/songs';
@@ -16,6 +16,7 @@ interface ScrollingState {
   activeSong: Song | null;
   songCurrentNoteIndex: number;
   startTime: number;
+  songNextNoteTime: number;
   demoActiveNote: Note | null;
 
   // Actions
@@ -41,6 +42,7 @@ export const useScrollingStore = create<ScrollingState>((set, get) => ({
   activeSong: null,
   songCurrentNoteIndex: 0,
   startTime: 0,
+  songNextNoteTime: 0,
   demoActiveNote: null,
 
   resetSession: () =>
@@ -55,6 +57,7 @@ export const useScrollingStore = create<ScrollingState>((set, get) => ({
       activeSong: null,
       songCurrentNoteIndex: 0,
       startTime: 0,
+      songNextNoteTime: 0,
       demoActiveNote: null,
     }),
 
@@ -71,7 +74,11 @@ export const useScrollingStore = create<ScrollingState>((set, get) => ({
       ? SONGS.find((s) => s.id === settings.selectedSongId) || null
       : null;
 
-    set({ activeSong: selectedSong, startTime: Date.now() });
+    set({
+      activeSong: selectedSong,
+      startTime: Date.now(),
+      songNextNoteTime: Date.now() + 1000, // Start first note after 1s
+    });
 
     if (!selectedSong) {
       get().spawnNote();
@@ -80,38 +87,87 @@ export const useScrollingStore = create<ScrollingState>((set, get) => ({
 
   spawnNote: () => {
     const { settings } = useGameStore.getState();
-    const { scrollingNotes, activeSong, songCurrentNoteIndex } = get();
+    const { scrollingNotes, activeSong, songCurrentNoteIndex, songNextNoteTime } = get();
 
-    let newNote: Note | undefined;
+    let noteToSpawn: Note | undefined;
+    let keys: string[] = [];
+    let duration: string = 'q';
+    let nextSpawnDelay = 1000; // Default for random
 
     if (activeSong) {
       if (songCurrentNoteIndex < activeSong.notes.length) {
-        newNote = activeSong.notes[songCurrentNoteIndex].note;
-        set({ songCurrentNoteIndex: songCurrentNoteIndex + 1 });
+        const songNote = activeSong.notes[songCurrentNoteIndex];
+        noteToSpawn = songNote.note;
+        keys = songNote.keys;
+        duration = songNote.duration;
+
+        // Calculate when the NEXT note should spawn based on current note duration
+        nextSpawnDelay = getDurationMs(duration, activeSong.bpm);
+
+        set({
+          songCurrentNoteIndex: songCurrentNoteIndex + 1,
+          songNextNoteTime: songNextNoteTime + nextSpawnDelay,
+        });
       }
     } else {
       const lastNote =
         scrollingNotes.length > 0 ? scrollingNotes[scrollingNotes.length - 1].note : undefined;
-      newNote = generateRandomNote(settings.activeNotes, lastNote);
+      noteToSpawn = generateRandomNote(settings.activeNotes, lastNote);
+      if (noteToSpawn) {
+        keys = [`${noteToSpawn.name.toLowerCase()}/${noteToSpawn.octave}`];
+        duration = 'q';
+      }
+      set({ lastSpawnTime: Date.now() });
     }
 
-    if (newNote) {
-      const newNode = {
+    if (noteToSpawn) {
+      const newNode: ScrollingNote = {
         id: Math.random().toString(36).substr(2, 9),
-        note: newNote,
+        note: noteToSpawn,
+        keys,
+        duration,
         x: 100,
-        spawnedAt: Date.now(),
+        spawnedAt: activeSong ? songNextNoteTime : Date.now(),
       };
-      set({ scrollingNotes: [...scrollingNotes, newNode], lastSpawnTime: Date.now() });
+      set({ scrollingNotes: [...scrollingNotes, newNode] });
     }
   },
 
   updateNotePositions: (deltaTime: number, speed: number) => {
-    const { scrollingNotes, missedNotes } = get();
-    const { recordTurn } = useGameStore.getState();
+    const {
+      scrollingNotes,
+      missedNotes,
+      activeSong,
+      songCurrentNoteIndex,
+      songNextNoteTime,
+      isPaused,
+    } = get();
+    if (isPaused) return;
 
+    const { recordTurn, settings } = useGameStore.getState();
+
+    // Spawn song notes based on time
+    if (
+      activeSong &&
+      songCurrentNoteIndex < activeSong.notes.length &&
+      Date.now() >= songNextNoteTime
+    ) {
+      get().spawnNote();
+    }
+
+    // Spawn random notes based on overlap/distance (simplified)
+    const currentNotes = get().scrollingNotes;
+    if (
+      !activeSong &&
+      (currentNotes.length === 0 || currentNotes[currentNotes.length - 1].x < 70)
+    ) {
+      get().spawnNote();
+    }
+
+    // Refresh notes list before updating positions
+    const finalNotes = get().scrollingNotes;
     let newMissed = missedNotes;
-    const updatedNotes = scrollingNotes
+    const updatedNotes = finalNotes
       .map((n) => ({ ...n, x: n.x - speed * deltaTime }))
       .filter((n) => {
         if (n.x < 5) {
@@ -125,10 +181,9 @@ export const useScrollingStore = create<ScrollingState>((set, get) => ({
     set({ scrollingNotes: updatedNotes, missedNotes: newMissed });
 
     // Auto-finish song if all notes are processed
-    const activeSong = get().activeSong;
     if (
       activeSong &&
-      get().songCurrentNoteIndex >= activeSong.notes.length &&
+      songCurrentNoteIndex >= activeSong.notes.length &&
       updatedNotes.length === 0
     ) {
       setTimeout(() => {
@@ -138,22 +193,27 @@ export const useScrollingStore = create<ScrollingState>((set, get) => ({
     }
 
     // Demo Mode: Auto-play
-    const settings = useGameStore.getState().settings;
     if (settings.gameMode === 'demo' && updatedNotes.length > 0) {
       const leftmostNote = updatedNotes.reduce((prev, curr) => (prev.x < curr.x ? prev : curr));
       if (leftmostNote.x < 15) {
-        get().hitNote(leftmostNote.note.name, {
-          correctAnswer: '...', // Not shown in demo
-          incorrectAnswer: '...',
-        });
-        set({ demoActiveNote: leftmostNote.note });
-        setTimeout(() => set({ demoActiveNote: null }), 300);
+        // Only trigger if not already active or it's a new note
+        if (
+          !get().demoActiveNote ||
+          get().demoActiveNote.absoluteIndex !== leftmostNote.note.absoluteIndex
+        ) {
+          get().hitNote(leftmostNote.note.name, {
+            correctAnswer: '...', // Not shown in demo
+            incorrectAnswer: '...',
+          });
+          set({ demoActiveNote: leftmostNote.note });
+          setTimeout(() => set({ demoActiveNote: null }), 300);
+        }
       }
     }
   },
 
   hitNote: (selectedName, t) => {
-    const { scrollingNotes } = get();
+    const { scrollingNotes, activeSong, songCurrentNoteIndex } = get();
     const { recordTurn, settings } = useGameStore.getState();
 
     if (scrollingNotes.length === 0) return;
@@ -177,10 +237,9 @@ export const useScrollingStore = create<ScrollingState>((set, get) => ({
       setTimeout(() => set({ feedback: null }), 500);
 
       // Auto-finish song if all notes are processed
-      const activeSong = get().activeSong;
       if (
         activeSong &&
-        get().songCurrentNoteIndex >= activeSong.notes.length &&
+        songCurrentNoteIndex >= activeSong.notes.length &&
         remainingNotes.length === 0
       ) {
         setTimeout(() => {

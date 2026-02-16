@@ -12,6 +12,8 @@ export type GameMode = 'standard' | 'scrolling' | 'demo';
 
 export interface ScrollingNote {
   id: string;
+  keys: string[];
+  duration: string;
   note: Note;
   x: number; // 0 to 100 representing percentage from right to left
   spawnedAt: number;
@@ -137,12 +139,14 @@ export interface Translations {
 }
 
 export interface SongNote {
+  keys: string[];
+  duration: string;
   note: Note;
-  timeOffset: number; // Milliseconds from the start of the song
 }
 
 export interface Song {
   id: string;
   name: string;
+  bpm: number;
   notes: SongNote[];
 }
