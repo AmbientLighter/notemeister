@@ -42,7 +42,7 @@ const GameScreen: React.FC = () => {
   } = useScrollingMode();
 
   // Derived Values based on Mode
-  const isScrolling = settings.gameMode === 'scrolling';
+  const isScrolling = settings.gameMode === 'scrolling' || settings.gameMode === 'demo';
   const feedback = isScrolling ? scrollingFeedback : standardFeedback;
   const isProcessing = isScrolling ? false : standardIsProcessing;
   const lastCorrectNote = isScrolling ? scrollingLastCorrectNote : standardLastCorrectNote;
@@ -83,7 +83,7 @@ const GameScreen: React.FC = () => {
       {/* Main Content Area */}
       <div className="flex-1 w-full flex flex-col items-center justify-center p-2 sm:p-4 gap-4 sm:gap-6">
         <div className="w-full flex justify-between items-center px-4">
-          <FeedbackBubble feedback={feedback} />
+          {settings.gameMode !== 'demo' && <FeedbackBubble feedback={feedback} />}
 
           {settings.gameMode === 'scrolling' && (
             <div className="flex gap-2">
@@ -97,7 +97,7 @@ const GameScreen: React.FC = () => {
         </div>
 
         <div className="w-full max-w-3xl aspect-[3/2] sm:aspect-[2/1] md:aspect-[2.5/1] relative">
-          {settings.gameMode === 'scrolling' ? (
+          {settings.gameMode === 'scrolling' || settings.gameMode === 'demo' ? (
             <ScrollingStaffCanvas
               clef={settings.clef}
               notes={scrollingNotes}
@@ -108,7 +108,7 @@ const GameScreen: React.FC = () => {
           )}
 
           {/* Microphone Status Overlay */}
-          {settings.inputMode === 'microphone' && (
+          {settings.inputMode === 'microphone' && settings.gameMode !== 'demo' && (
             <MicStatusOverlay
               isActive={isMicActive}
               detectedNote={detectedNote}
@@ -126,7 +126,7 @@ const GameScreen: React.FC = () => {
         </p>
 
         {/* Keyboard / Input Interface */}
-        {settings.inputMode === 'keyboard' && (
+        {settings.inputMode === 'keyboard' && settings.gameMode !== 'demo' && (
           <Keyboard
             onNoteSelect={onNoteSelect}
             disabled={isProcessing}
@@ -135,7 +135,9 @@ const GameScreen: React.FC = () => {
           />
         )}
 
-        {settings.inputMode === 'virtual_keyboard' && <PianoKeyboard onNote={onNoteSelect} />}
+        {(settings.inputMode === 'virtual_keyboard' || settings.gameMode === 'demo') && (
+          <PianoKeyboard onNote={onNoteSelect} />
+        )}
       </div>
 
       {/* Mobile Finish Button */}

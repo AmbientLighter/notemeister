@@ -16,6 +16,7 @@ interface ScrollingState {
   activeSong: Song | null;
   songCurrentNoteIndex: number;
   startTime: number;
+  demoActiveNote: Note | null;
 
   // Actions
   startGame: () => void;
@@ -40,6 +41,7 @@ export const useScrollingStore = create<ScrollingState>((set, get) => ({
   activeSong: null,
   songCurrentNoteIndex: 0,
   startTime: 0,
+  demoActiveNote: null,
 
   resetSession: () =>
     set({
@@ -53,6 +55,7 @@ export const useScrollingStore = create<ScrollingState>((set, get) => ({
       activeSong: null,
       songCurrentNoteIndex: 0,
       startTime: 0,
+      demoActiveNote: null,
     }),
 
   setPaused: (paused) => set({ isPaused: paused }),
@@ -129,8 +132,23 @@ export const useScrollingStore = create<ScrollingState>((set, get) => ({
       updatedNotes.length === 0
     ) {
       setTimeout(() => {
-        useGameStore.getState().setScreen('results');
+        const screen = useGameStore.getState().settings.gameMode === 'demo' ? 'setup' : 'results';
+        useGameStore.getState().setScreen(screen);
       }, 1500); // Small delay for the last note feedback
+    }
+
+    // Demo Mode: Auto-play
+    const settings = useGameStore.getState().settings;
+    if (settings.gameMode === 'demo' && updatedNotes.length > 0) {
+      const leftmostNote = updatedNotes.reduce((prev, curr) => (prev.x < curr.x ? prev : curr));
+      if (leftmostNote.x < 15) {
+        get().hitNote(leftmostNote.note.name, {
+          correctAnswer: '...', // Not shown in demo
+          incorrectAnswer: '...',
+        });
+        set({ demoActiveNote: leftmostNote.note });
+        setTimeout(() => set({ demoActiveNote: null }), 300);
+      }
     }
   },
 
@@ -166,7 +184,8 @@ export const useScrollingStore = create<ScrollingState>((set, get) => ({
         remainingNotes.length === 0
       ) {
         setTimeout(() => {
-          useGameStore.getState().setScreen('results');
+          const screen = useGameStore.getState().settings.gameMode === 'demo' ? 'setup' : 'results';
+          useGameStore.getState().setScreen(screen);
         }, 1500);
       }
     } else {

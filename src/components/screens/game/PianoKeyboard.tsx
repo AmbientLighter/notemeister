@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import type { NoteName } from '@/types';
 import { useGameStore } from '@/store/useGameStore';
+import { useScrollingStore } from '@/store/useScrollingStore';
 import { audioEngine } from '@/utils/audio';
 
 interface PianoKeyboardProps {
@@ -8,9 +9,24 @@ interface PianoKeyboardProps {
   activeNotes?: string[]; // Optional to highlight currently played notes
 }
 
-const PianoKeyboard: React.FC<PianoKeyboardProps> = ({ onNote }) => {
+const PianoKeyboard: React.FC<PianoKeyboardProps> = ({
+  onNote,
+  activeNotes: externalActiveNotes,
+}) => {
   const settings = useGameStore((state) => state.settings);
+  const demoActiveNote = useScrollingStore((state) => state.demoActiveNote);
   const { instrument } = settings;
+
+  // Combine external active notes with demo active note
+  const activeNotes = useMemo(() => {
+    const notes: { name: NoteName; octave?: number }[] = (externalActiveNotes || []).map((n) => ({
+      name: n as NoteName,
+    }));
+    if (demoActiveNote) {
+      notes.push({ name: demoActiveNote.name, octave: demoActiveNote.octave });
+    }
+    return notes;
+  }, [externalActiveNotes, demoActiveNote]);
 
   // Define keys for approximately 2 octaves (matching typical staff range)
   // C3 to B4
@@ -51,7 +67,17 @@ const PianoKeyboard: React.FC<PianoKeyboardProps> = ({ onNote }) => {
                   ? 'bg-slate-800 dark:bg-black w-8 h-28 -mx-4 z-10 rounded-b-md shadow-lg border-x border-slate-700/50 hover:bg-slate-700 pointer-events-auto'
                   : 'bg-white dark:bg-slate-100 w-12 h-48 border border-slate-200 dark:border-slate-300 rounded-b-xl shadow-md hover:bg-slate-50 z-0'
               }
-              ${key.isBlack ? 'active:bg-slate-600' : 'active:bg-indigo-50'}
+               ${
+                 activeNotes.some(
+                   (n) => n.name === key.name && (n.octave === undefined || n.octave === key.octave)
+                 )
+                   ? key.isBlack
+                     ? 'bg-indigo-600 dark:bg-indigo-500 shadow-indigo-200/50'
+                     : 'bg-indigo-100 dark:bg-indigo-200 border-indigo-300'
+                   : key.isBlack
+                     ? 'active:bg-slate-600'
+                     : 'active:bg-indigo-50'
+               }
               flex items-end justify-center pb-4
             `}
             style={key.isBlack ? { marginLeft: '-1rem', marginRight: '-1rem' } : {}}

@@ -14,7 +14,7 @@ export const useScrollingMode = () => {
   const isPaused = useScrollingStore((state) => state.isPaused);
   const setPaused = useScrollingStore((state) => state.setPaused);
 
-  const isScrolling = settings.gameMode === 'scrolling';
+  const isScrolling = settings.gameMode === 'scrolling' || settings.gameMode === 'demo';
 
   useEffect(() => {
     if (!isScrolling) return;

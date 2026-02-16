@@ -8,7 +8,7 @@ export type AppTheme = 'light' | 'dark' | 'system';
 
 export type Screen = 'setup' | 'game' | 'results';
 export type SortMethod = 'difficulty' | 'name' | 'time';
-export type GameMode = 'standard' | 'scrolling';
+export type GameMode = 'standard' | 'scrolling' | 'demo';
 
 export interface ScrollingNote {
   id: string;
@@ -130,6 +130,7 @@ export interface Translations {
   gameMode: string;
   modeStandard: string;
   modeScrolling: string;
+  modeDemo: string;
   missed: string;
   selectSong: string;
   songRandom: string;

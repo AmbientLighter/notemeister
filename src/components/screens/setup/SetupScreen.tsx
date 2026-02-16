@@ -22,7 +22,10 @@ const SetupScreen: React.FC = () => {
   const startStandardGame = useSessionStore((state) => state.startGame);
   const startScrollingGame = useScrollingStore((state) => state.startGame);
 
-  const startGame = settings.gameMode === 'scrolling' ? startScrollingGame : startStandardGame;
+  const startGame =
+    settings.gameMode === 'scrolling' || settings.gameMode === 'demo'
+      ? startScrollingGame
+      : startStandardGame;
 
   const [showAdvanced, setShowAdvanced] = React.useState(false);
 
@@ -76,7 +79,9 @@ const SetupScreen: React.FC = () => {
             <ThemeSelector />
             <LanguagePicker />
             <ModeSelector />
-            {settings.gameMode === 'scrolling' && <SongSelector />}
+            {(settings.gameMode === 'scrolling' || settings.gameMode === 'demo') && (
+              <SongSelector />
+            )}
             <ClefSelector />
             <TempoSelector />
             <InputMethodSelector />

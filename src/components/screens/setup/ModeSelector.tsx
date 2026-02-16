@@ -1,7 +1,7 @@
 import React from 'react';
 import { useGameStore } from '@/store/useGameStore';
 import { useTranslations } from '@/hooks/useTranslations';
-import { List, Play } from 'lucide-react';
+import { List, Play, MonitorPlay } from 'lucide-react';
 import Dropdown from '@/components/common/Dropdown';
 
 const ModeSelector: React.FC = () => {
@@ -12,6 +12,7 @@ const ModeSelector: React.FC = () => {
   const modes = [
     { id: 'standard', label: t.modeStandard, icon: <List className="w-5 h-5 text-blue-500" /> },
     { id: 'scrolling', label: t.modeScrolling, icon: <Play className="w-5 h-5 text-indigo-500" /> },
+    { id: 'demo', label: t.modeDemo, icon: <MonitorPlay className="w-5 h-5 text-purple-500" /> },
   ] as const;
 
   return (
