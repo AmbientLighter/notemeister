@@ -3,7 +3,7 @@ export type ClefType = 'treble' | 'bass';
 export type NoteName = 'C' | 'D' | 'E' | 'F' | 'G' | 'A' | 'B';
 export type Tempo = 'slow' | 'normal' | 'fast';
 export type Instrument = 'silence' | 'piano' | 'guitar' | 'flute';
-export type InputMode = 'keyboard' | 'midi' | 'microphone';
+export type InputMode = 'keyboard' | 'midi' | 'microphone' | 'virtual_keyboard';
 export type AppTheme = 'light' | 'dark' | 'system';
 
 export type Screen = 'setup' | 'game' | 'results';
@@ -120,6 +120,7 @@ export interface Translations {
   inputModeKeyboard: string;
   inputModeMidi: string;
   inputModeMicrophone: string;
+  inputModeVirtualKeyboard: string;
   showAdvancedSettings: string;
   hideAdvancedSettings: string;
   selectTheme: string;

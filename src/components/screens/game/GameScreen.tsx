@@ -13,6 +13,7 @@ import FeedbackBubble from './FeedbackBubble';
 import { useTranslations } from '@/hooks/useTranslations';
 import { useInputManager } from '@/hooks/inputs/useInputManager';
 import MicStatusOverlay from './MicStatusOverlay';
+import PianoKeyboard from './PianoKeyboard';
 
 const GameScreen: React.FC = () => {
   const { t } = useTranslations();
@@ -124,8 +125,8 @@ const GameScreen: React.FC = () => {
             : t.question}
         </p>
 
-        {/* Keyboard */}
-        {settings.inputMode !== 'microphone' && (
+        {/* Keyboard / Input Interface */}
+        {settings.inputMode === 'keyboard' && (
           <Keyboard
             onNoteSelect={onNoteSelect}
             disabled={isProcessing}
@@ -133,6 +134,8 @@ const GameScreen: React.FC = () => {
             lastIncorrectNote={lastIncorrectNote}
           />
         )}
+
+        {settings.inputMode === 'virtual_keyboard' && <PianoKeyboard onNote={onNoteSelect} />}
       </div>
 
       {/* Mobile Finish Button */}
