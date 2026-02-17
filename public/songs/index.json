@@ -1,0 +1,26 @@
+[
+  {
+    "id": "c-major-scale",
+    "name": "🎹 C Major Scale",
+    "bpm": 60,
+    "path": "songs/c-major-scale.xml"
+  },
+  {
+    "id": "mary-had-a-little-lamb",
+    "name": "🐑 Mary Had a Little Lamb",
+    "bpm": 90,
+    "path": "songs/mary-had-a-little-lamb.xml"
+  },
+  {
+    "id": "ode-to-joy",
+    "name": "🇪🇺 Ode to Joy",
+    "bpm": 120,
+    "path": "songs/ode-to-joy.xml"
+  },
+  {
+    "id": "twinkle-twinkle",
+    "name": "✨ Twinkle Twinkle",
+    "bpm": 80,
+    "path": "songs/twinkle-twinkle.xml"
+  }
+]

@@ -144,9 +144,14 @@ export interface SongNote {
   note: Note;
 }
 
-export interface Song {
+export interface SongMeta {
   id: string;
   name: string;
   bpm: number;
+  path: string;
+}
+
+export interface Song extends SongMeta {
   notes: SongNote[];
+  xml?: string;
 }

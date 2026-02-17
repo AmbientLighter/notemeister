@@ -1,9 +1,10 @@
 import { create } from 'zustand';
-import type { Note, NoteName, ScrollingNote, Song } from '@/types';
+import type { Note, NoteName, ScrollingNote, Song, SongMeta } from '@/types';
 import { generateRandomNote, getDurationMs } from '@/utils/musicLogic';
 import { audioEngine } from '@/utils/audio';
 import { useGameStore } from './useGameStore';
-import { SONGS } from '@/data/songs';
+import { BASE_URL } from '@/constants';
+import { parseMusicXML } from '@/utils/musicXmlParser';
 
 interface ScrollingState {
   scrollingNotes: ScrollingNote[];
@@ -14,6 +15,8 @@ interface ScrollingState {
   lastIncorrectNote: NoteName | null;
   isPaused: boolean;
   activeSong: Song | null;
+  musicXML: string;
+  availableSongs: SongMeta[];
   songCurrentNoteIndex: number;
   startTime: number;
   songNextNoteTime: number;
@@ -21,7 +24,8 @@ interface ScrollingState {
   currentNoteIndex: number; // Added for OSMD cursor tracking
 
   // Actions
-  startGame: () => void;
+  fetchAvailableSongs: () => Promise<void>;
+  startGame: () => Promise<void>;
   spawnNote: () => void;
   updateNotePositions: (deltaTime: number, speed: number) => void;
   hitNote: (
@@ -41,6 +45,8 @@ export const useScrollingStore = create<ScrollingState>((set, get) => ({
   lastIncorrectNote: null,
   isPaused: false,
   activeSong: null,
+  musicXML: '',
+  availableSongs: [],
   songCurrentNoteIndex: 0,
   startTime: 0,
   songNextNoteTime: 0,
@@ -57,6 +63,7 @@ export const useScrollingStore = create<ScrollingState>((set, get) => ({
       lastIncorrectNote: null,
       isPaused: false,
       activeSong: null,
+      musicXML: '',
       songCurrentNoteIndex: 0,
       startTime: 0,
       songNextNoteTime: 0,
@@ -66,24 +73,58 @@ export const useScrollingStore = create<ScrollingState>((set, get) => ({
 
   setPaused: (paused) => set({ isPaused: paused }),
 
-  startGame: () => {
+  fetchAvailableSongs: async () => {
+    try {
+      const response = await fetch(`${BASE_URL}songs/index.json`);
+      if (!response.ok) throw new Error('Failed to fetch song index');
+      const songs = await response.json();
+      set({ availableSongs: songs });
+    } catch (err) {
+      console.error('[Store] Error fetching available songs:', err);
+    }
+  },
+
+  startGame: async () => {
     audioEngine.init();
     const { settings, resetStats, setScreen } = useGameStore.getState();
+
+    // Ensure we have songs loaded
+    if (get().availableSongs.length === 0) {
+      await get().fetchAvailableSongs();
+    }
+
+    const { availableSongs } = get();
+    const selectedMeta = settings.selectedSongId
+      ? availableSongs.find((s) => s.id === settings.selectedSongId) || null
+      : null;
+
+    let loadedXML = '';
+    let activeSong: Song | null = null;
+
+    if (selectedMeta) {
+      try {
+        const response = await fetch(`${BASE_URL}${selectedMeta.path}`);
+        if (!response.ok) throw new Error('Failed to fetch song XML');
+        loadedXML = await response.text();
+        // Parse the XML to extract notes and full song data
+        activeSong = parseMusicXML(loadedXML, selectedMeta.id);
+      } catch (err) {
+        console.error('[Store] Error loading selected song:', err);
+      }
+    }
+
     resetStats();
     setScreen('game');
     get().resetSession();
 
-    const selectedSong = settings.selectedSongId
-      ? SONGS.find((s) => s.id === settings.selectedSongId) || null
-      : null;
-
     set({
-      activeSong: selectedSong,
+      activeSong,
+      musicXML: loadedXML,
       startTime: Date.now(),
       songNextNoteTime: Date.now() + 1000, // Start first note after 1s
     });
 
-    if (!selectedSong) {
+    if (!activeSong) {
       get().spawnNote();
     }
   },

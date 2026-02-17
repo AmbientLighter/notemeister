@@ -21,6 +21,11 @@ const SetupScreen: React.FC = () => {
   const toggleSingleNote = useGameStore((state) => state.toggleSingleNote);
   const startStandardGame = useSessionStore((state) => state.startGame);
   const startScrollingGame = useScrollingStore((state) => state.startGame);
+  const fetchAvailableSongs = useScrollingStore((state) => state.fetchAvailableSongs);
+
+  React.useEffect(() => {
+    fetchAvailableSongs();
+  }, [fetchAvailableSongs]);
 
   const startGame =
     settings.gameMode === 'scrolling' || settings.gameMode === 'demo'
