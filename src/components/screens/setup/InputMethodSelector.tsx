@@ -1,5 +1,5 @@
 import React from 'react';
-import { Keyboard, Mic, Usb, Music2 } from 'lucide-react';
+import { Keyboard, Mic, Usb, Music2, Speech } from 'lucide-react';
 import { useGameStore } from '@/store/useGameStore';
 import { useTranslations } from '@/hooks/useTranslations';
 import type { InputMode } from '@/types';
@@ -12,25 +12,34 @@ const InputMethodSelector: React.FC = () => {
 
   const methods = [
     {
-      id: 'keyboard',
+      id: 'keyboard' as const,
       icon: <Keyboard className="w-5 h-5 text-amber-500" />,
       label: t.inputModeKeyboard,
     },
-    { id: 'midi', icon: <Usb className="w-5 h-5 text-blue-500" />, label: t.inputModeMidi },
     {
-      id: 'microphone',
+      id: 'midi' as const,
+      icon: <Usb className="w-5 h-5 text-blue-500" />,
+      label: t.inputModeMidi,
+    },
+    {
+      id: 'microphone' as const,
       icon: <Mic className="w-5 h-5 text-rose-500" />,
       label: t.inputModeMicrophone,
     },
     {
-      id: 'virtual_keyboard',
+      id: 'voice' as const,
+      icon: <Speech className="w-5 h-5 text-emerald-500" />,
+      label: t.inputModeVoice,
+    },
+    {
+      id: 'virtual_keyboard' as const,
       icon: <Music2 className="w-5 h-5 text-purple-500" />,
       label: t.inputModeVirtualKeyboard,
     },
-  ] as const;
+  ];
 
   return (
-    <Dropdown
+    <Dropdown<InputMode>
       label={t.selectInputMode}
       options={methods}
       value={settings.inputMode}

@@ -97,17 +97,32 @@ const GameScreen: React.FC = () => {
       {/* Main Content Area */}
       <div className="flex-1 w-full flex flex-col items-center justify-center p-2 sm:p-4 gap-4 sm:gap-6">
         <div className="w-full flex justify-between items-center px-4">
-          {settings.gameMode !== 'demo' && <FeedbackBubble feedback={feedback} />}
+          <div className="flex-1">
+            {settings.gameMode !== 'demo' && <FeedbackBubble feedback={feedback} />}
+          </div>
 
-          {settings.gameMode === 'scrolling' && (
-            <div className="flex gap-2">
-              <PauseButton isPaused={isPaused} onToggle={() => setPaused(!isPaused)} />
-
-              {isPaused && (
-                <FinishSessionButton className="px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-full font-bold shadow-lg shadow-rose-200 active:scale-95 transition-all flex items-center gap-2" />
+          <div className="flex items-center gap-3">
+            {/* Microphone/Voice Status Overlay */}
+            {(settings.inputMode === 'microphone' || settings.inputMode === 'voice') &&
+              settings.gameMode !== 'demo' && (
+                <MicStatusOverlay
+                  isActive={isMicActive}
+                  detectedNote={detectedNote}
+                  error={micError}
+                  onActivate={startDetection}
+                />
               )}
-            </div>
-          )}
+
+            {settings.gameMode === 'scrolling' && (
+              <div className="flex gap-2">
+                <PauseButton isPaused={isPaused} onToggle={() => setPaused(!isPaused)} />
+
+                {isPaused && (
+                  <FinishSessionButton className="px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-full font-bold shadow-lg shadow-rose-200 active:scale-95 transition-all flex items-center gap-2" />
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="w-full max-w-3xl aspect-[3/2] sm:aspect-[2/1] md:aspect-[2.5/1] relative">
@@ -128,16 +143,6 @@ const GameScreen: React.FC = () => {
             )
           ) : (
             <StaffCanvas clef={settings.clef} note={currentNote} className="w-full h-full" />
-          )}
-
-          {/* Microphone Status Overlay */}
-          {settings.inputMode === 'microphone' && settings.gameMode !== 'demo' && (
-            <MicStatusOverlay
-              isActive={isMicActive}
-              detectedNote={detectedNote}
-              error={micError}
-              onActivate={startDetection}
-            />
           )}
         </div>
 

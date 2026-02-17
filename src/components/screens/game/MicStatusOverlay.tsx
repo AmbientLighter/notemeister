@@ -8,35 +8,41 @@ interface MicStatusOverlayProps {
   onActivate: () => void;
 }
 
+import { useTranslations } from '@/hooks/useTranslations';
+
 const MicStatusOverlay: React.FC<MicStatusOverlayProps> = ({
   isActive,
   detectedNote,
   error,
   onActivate,
 }) => {
+  const { t } = useTranslations();
+
   return (
-    <div className="absolute top-4 right-4 flex flex-col items-end gap-2">
+    <div className="flex flex-col items-end gap-1">
       {!isActive ? (
         <button
           onClick={onActivate}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-full flex items-center gap-2 shadow-lg transition-all animate-pulse"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-full flex items-center gap-2 shadow-md transition-all active:scale-95"
         >
-          <Mic size={18} />
-          <span className="text-sm font-bold uppercase tracking-tight">Activate Mic</span>
+          <Mic size={16} />
+          <span className="text-xs font-bold uppercase tracking-tight">{t.activateMic}</span>
         </button>
       ) : (
-        <div className="flex flex-col items-end">
-          <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border border-indigo-100 dark:border-indigo-900/50 px-4 py-2 rounded-2xl flex items-center gap-3 shadow-xl">
-            <Activity className="text-indigo-500 animate-pulse" size={18} />
-            <div className="flex flex-col">
-              <span className="text-[10px] uppercase font-bold text-slate-400 leading-none mb-1">
-                Detected
-              </span>
-              <span className="text-lg font-black text-indigo-600 dark:text-indigo-400 leading-none">
+        <div className="flex items-center gap-2 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-indigo-100 dark:border-indigo-900/40 px-3 py-1.5 rounded-full shadow-lg">
+          <Activity className="text-indigo-500 animate-pulse" size={16} />
+          {detectedNote !== '-' ? (
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] uppercase font-bold text-slate-400">{t.detected}</span>
+              <span className="text-sm font-black text-indigo-600 dark:text-indigo-400">
                 {detectedNote}
               </span>
             </div>
-          </div>
+          ) : (
+            <span className="text-[10px] uppercase font-bold text-slate-400 animate-pulse">
+              ...
+            </span>
+          )}
         </div>
       )}
       {error && (
