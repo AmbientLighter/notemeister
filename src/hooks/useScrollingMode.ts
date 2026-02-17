@@ -48,5 +48,7 @@ export const useScrollingMode = () => {
     lastIncorrectNote,
     isPaused,
     setPaused,
+    currentNoteIndex: useScrollingStore((state) => state.currentNoteIndex),
+    activeSong: useScrollingStore((state) => state.activeSong),
   };
 };

@@ -15,6 +15,7 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",
     "lucide-react": "^0.564.0",
+    "opensheetmusicdisplay": "^1.9.6",
     "pitchfinder": "^2.3.4",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",

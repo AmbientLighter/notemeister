@@ -14,6 +14,9 @@ import { useTranslations } from '@/hooks/useTranslations';
 import { useInputManager } from '@/hooks/inputs/useInputManager';
 import MicStatusOverlay from './MicStatusOverlay';
 import PianoKeyboard from './PianoKeyboard';
+import OSMDCanvas from './OSMDCanvas';
+import { convertToMusicXML } from '@/utils/musicXmlUtils';
+import { useScrollingStore } from '@/store/useScrollingStore';
 
 const GameScreen: React.FC = () => {
   const { t } = useTranslations();
@@ -39,6 +42,8 @@ const GameScreen: React.FC = () => {
     lastIncorrectNote: scrollingLastIncorrectNote,
     isPaused,
     setPaused,
+    currentNoteIndex,
+    activeSong,
   } = useScrollingMode();
 
   // Derived Values based on Mode
@@ -48,6 +53,15 @@ const GameScreen: React.FC = () => {
   const lastCorrectNote = isScrolling ? scrollingLastCorrectNote : standardLastCorrectNote;
   const lastIncorrectNote = isScrolling ? scrollingLastIncorrectNote : standardLastIncorrectNote;
   const currentNote = isScrolling ? null : standardNote;
+
+  const demoActiveNote = useScrollingStore((state) => state.demoActiveNote);
+
+  // Prepare MusicXML for OSMD
+  const musicXML = React.useMemo(() => {
+    if (!activeSong) return '';
+    return convertToMusicXML(activeSong, settings.clef);
+  }, [activeSong, settings.clef]);
+
   const {
     isActive: isMicActive,
     error: micError,
@@ -63,7 +77,7 @@ const GameScreen: React.FC = () => {
   }, [currentNote, nextTurn, settings.gameMode]);
 
   function onNoteSelect(name: NoteName) {
-    if (settings.gameMode === 'scrolling') {
+    if (settings.gameMode === 'scrolling' || settings.gameMode === 'demo') {
       hitNote(name, {
         correctAnswer: t.correctAnswer,
         incorrectAnswer: t.incorrectAnswer,
@@ -98,11 +112,20 @@ const GameScreen: React.FC = () => {
 
         <div className="w-full max-w-3xl aspect-[3/2] sm:aspect-[2/1] md:aspect-[2.5/1] relative">
           {settings.gameMode === 'scrolling' || settings.gameMode === 'demo' ? (
-            <ScrollingStaffCanvas
-              clef={settings.clef}
-              notes={scrollingNotes}
-              className="w-full h-full"
-            />
+            activeSong ? (
+              <OSMDCanvas
+                xml={musicXML}
+                clef={settings.clef}
+                cursorIndex={currentNoteIndex}
+                className="w-full h-full"
+              />
+            ) : (
+              <ScrollingStaffCanvas
+                clef={settings.clef}
+                notes={scrollingNotes}
+                className="w-full h-full"
+              />
+            )
           ) : (
             <StaffCanvas clef={settings.clef} note={currentNote} className="w-full h-full" />
           )}

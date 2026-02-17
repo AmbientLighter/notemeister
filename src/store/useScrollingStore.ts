@@ -18,6 +18,7 @@ interface ScrollingState {
   startTime: number;
   songNextNoteTime: number;
   demoActiveNote: Note | null;
+  currentNoteIndex: number; // Added for OSMD cursor tracking
 
   // Actions
   startGame: () => void;
@@ -44,6 +45,7 @@ export const useScrollingStore = create<ScrollingState>((set, get) => ({
   startTime: 0,
   songNextNoteTime: 0,
   demoActiveNote: null,
+  currentNoteIndex: 0,
 
   resetSession: () =>
     set({
@@ -59,6 +61,7 @@ export const useScrollingStore = create<ScrollingState>((set, get) => ({
       startTime: 0,
       songNextNoteTime: 0,
       demoActiveNote: null,
+      currentNoteIndex: 0,
     }),
 
   setPaused: (paused) => set({ isPaused: paused }),
@@ -140,6 +143,7 @@ export const useScrollingStore = create<ScrollingState>((set, get) => ({
       activeSong,
       songCurrentNoteIndex,
       songNextNoteTime,
+      currentNoteIndex,
       isPaused,
     } = get();
     if (isPaused) return;
@@ -180,42 +184,88 @@ export const useScrollingStore = create<ScrollingState>((set, get) => ({
 
     set({ scrollingNotes: updatedNotes, missedNotes: newMissed });
 
-    // Auto-finish song if all notes are processed
-    if (
-      activeSong &&
-      songCurrentNoteIndex >= activeSong.notes.length &&
-      updatedNotes.length === 0
-    ) {
-      setTimeout(() => {
-        const screen = useGameStore.getState().settings.gameMode === 'demo' ? 'setup' : 'results';
-        useGameStore.getState().setScreen(screen);
-      }, 1500); // Small delay for the last note feedback
-    }
-
     // Demo Mode: Auto-play
-    if (settings.gameMode === 'demo' && updatedNotes.length > 0) {
-      const leftmostNote = updatedNotes.reduce((prev, curr) => (prev.x < curr.x ? prev : curr));
-      if (leftmostNote.x < 15) {
-        // Only trigger if not already active or it's a new note
-        if (
-          !get().demoActiveNote ||
-          get().demoActiveNote.absoluteIndex !== leftmostNote.note.absoluteIndex
-        ) {
-          get().hitNote(leftmostNote.note.name, {
-            correctAnswer: '...', // Not shown in demo
-            incorrectAnswer: '...',
-          });
-          set({ demoActiveNote: leftmostNote.note });
-          setTimeout(() => set({ demoActiveNote: null }), 300);
+    if (settings.gameMode === 'demo') {
+      if (activeSong) {
+        // OSMD Mode: Auto-advance based on timing
+        if (Date.now() >= songNextNoteTime) {
+          const allNotes = activeSong.notes;
+          if (currentNoteIndex < allNotes.length) {
+            const targetNote = allNotes[currentNoteIndex];
+            get().hitNote(targetNote.note.name, {
+              correctAnswer: '...',
+              incorrectAnswer: '...',
+            });
+
+            // Calculate timing for SUBSEQUENT note
+            // We use the duration of the note we just "hit"
+            const durationMs = getDurationMs(targetNote.duration, activeSong.bpm);
+            set({ songNextNoteTime: Date.now() + durationMs });
+          }
+        }
+      } else if (updatedNotes.length > 0) {
+        // Random Scrolling Mode: Auto-play based on 'x' position
+        const leftmostNote = updatedNotes.reduce((prev, curr) => (prev.x < curr.x ? prev : curr));
+        if (leftmostNote.x < 15) {
+          if (
+            !get().demoActiveNote ||
+            get().demoActiveNote.absoluteIndex !== leftmostNote.note.absoluteIndex
+          ) {
+            get().hitNote(leftmostNote.note.name, {
+              correctAnswer: '...',
+              incorrectAnswer: '...',
+            });
+            set({ demoActiveNote: leftmostNote.note });
+            setTimeout(() => set({ demoActiveNote: null }), 300);
+          }
         }
       }
     }
   },
 
   hitNote: (selectedName, t) => {
-    const { scrollingNotes, activeSong, songCurrentNoteIndex } = get();
+    const { scrollingNotes, activeSong, songCurrentNoteIndex, currentNoteIndex } = get();
     const { recordTurn, settings } = useGameStore.getState();
 
+    if (activeSong) {
+      // In Song Mode with OSMD, we use currentNoteIndex to find the target note
+      const allNotes = activeSong.notes;
+      if (currentNoteIndex >= allNotes.length) return;
+
+      const targetSongNote = allNotes[currentNoteIndex];
+      const isCorrect = selectedName === targetSongNote.note.name;
+
+      recordTurn(targetSongNote.note, 0, isCorrect);
+
+      if (isCorrect) {
+        audioEngine.playNote(targetSongNote.note, settings.instrument);
+        set({
+          currentNoteIndex: currentNoteIndex + 1,
+          lastCorrectNote: targetSongNote.note.name,
+          feedback: { type: 'correct', message: t.correctAnswer },
+        });
+        setTimeout(() => set({ feedback: null }), 500);
+
+        if (currentNoteIndex + 1 >= allNotes.length) {
+          setTimeout(() => {
+            const screen = settings.gameMode === 'demo' ? 'setup' : 'results';
+            useGameStore.getState().setScreen(screen);
+          }, 1500);
+        }
+      } else {
+        set({
+          lastIncorrectNote: selectedName,
+          feedback: {
+            type: 'incorrect',
+            message: `${t.incorrectAnswer} ${targetSongNote.note.name}`,
+          },
+        });
+        setTimeout(() => set({ feedback: null }), 1000);
+      }
+      return;
+    }
+
+    // Fallback for random scrolling (will still use scrollingNotes for now)
     if (scrollingNotes.length === 0) return;
 
     const targetNode = scrollingNotes.reduce((prev, curr) => (prev.x < curr.x ? prev : curr));
@@ -235,18 +285,6 @@ export const useScrollingStore = create<ScrollingState>((set, get) => ({
         feedback: { type: 'correct', message: t.correctAnswer },
       });
       setTimeout(() => set({ feedback: null }), 500);
-
-      // Auto-finish song if all notes are processed
-      if (
-        activeSong &&
-        songCurrentNoteIndex >= activeSong.notes.length &&
-        remainingNotes.length === 0
-      ) {
-        setTimeout(() => {
-          const screen = useGameStore.getState().settings.gameMode === 'demo' ? 'setup' : 'results';
-          useGameStore.getState().setScreen(screen);
-        }, 1500);
-      }
     } else {
       set({
         lastIncorrectNote: selectedName,
