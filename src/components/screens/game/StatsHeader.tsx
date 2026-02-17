@@ -10,6 +10,41 @@ const StatsHeader: React.FC = () => {
   const stats = useGameStore((state) => state.stats);
   const settings = useGameStore((state) => state.settings);
   const missedNotes = useScrollingStore((state) => state.missedNotes);
+  const isPaused = useScrollingStore((state) => state.isPaused);
+  const setPaused = useScrollingStore((state) => state.setPaused);
+
+  const isDemo = settings.gameMode === 'demo';
+
+  if (isDemo) {
+    return (
+      <div className="w-full flex justify-between items-center py-4 px-6 bg-white dark:bg-slate-800 sm:rounded-b-3xl shadow-sm mb-6 transition-colors duration-200">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => setPaused(!isPaused)}
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-full font-bold transition-all active:scale-95 shadow-lg ${
+              isPaused
+                ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-200 dark:shadow-none'
+                : 'bg-amber-500 hover:bg-amber-600 text-white shadow-amber-200 dark:shadow-none'
+            }`}
+          >
+            {isPaused ? (
+              <>
+                <span className="text-xl">▶</span> {t.resume}
+              </>
+            ) : (
+              <>
+                <span className="text-xl">⏸</span> {t.pause}
+              </>
+            )}
+          </button>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <FinishSessionButton />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 pt-0 pb-4 px-4 sm:p-6 bg-white dark:bg-slate-800 sm:rounded-b-3xl shadow-sm mb-4 sm:mb-6 transition-colors duration-200">

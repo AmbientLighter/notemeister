@@ -4,3 +4,7 @@
 body {
   font-family: 'Inter Variable', 'Inter', sans-serif;
 }
+
+.osmd-container img {
+  height: 30px !important;
+}

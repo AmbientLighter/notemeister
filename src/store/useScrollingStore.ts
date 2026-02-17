@@ -150,28 +150,32 @@ export const useScrollingStore = create<ScrollingState>((set, get) => ({
 
     const { recordTurn, settings } = useGameStore.getState();
 
-    // Spawn song notes based on time
+    // Spawn song notes based on time (Only for random scrolling mode, not for OSMD songs)
     if (
       activeSong &&
       songCurrentNoteIndex < activeSong.notes.length &&
       Date.now() >= songNextNoteTime
     ) {
-      get().spawnNote();
+      // This `spawnNote` call is for visual scrolling notes in song mode.
+      // It should remain for non-demo song modes.
+      // For demo mode, the `hitNote` action will implicitly advance the `currentNoteIndex`
+      // and `songNextNoteTime` which then triggers the next visual note spawn.
+      if (settings.gameMode !== 'demo') {
+        get().spawnNote();
+      }
     }
 
-    // Spawn random notes based on overlap/distance (simplified)
-    const currentNotes = get().scrollingNotes;
+    // Spawn random notes based on overlap/distance
     if (
       !activeSong &&
-      (currentNotes.length === 0 || currentNotes[currentNotes.length - 1].x < 70)
+      (scrollingNotes.length === 0 || scrollingNotes[scrollingNotes.length - 1].x < 70)
     ) {
       get().spawnNote();
     }
 
     // Refresh notes list before updating positions
-    const finalNotes = get().scrollingNotes;
     let newMissed = missedNotes;
-    const updatedNotes = finalNotes
+    const updatedNotes = scrollingNotes
       .map((n) => ({ ...n, x: n.x - speed * deltaTime }))
       .filter((n) => {
         if (n.x < 5) {
@@ -192,15 +196,17 @@ export const useScrollingStore = create<ScrollingState>((set, get) => ({
           const allNotes = activeSong.notes;
           if (currentNoteIndex < allNotes.length) {
             const targetNote = allNotes[currentNoteIndex];
+
+            // Trigger the note hit
             get().hitNote(targetNote.note.name, {
               correctAnswer: '...',
               incorrectAnswer: '...',
             });
 
             // Calculate timing for SUBSEQUENT note
-            // We use the duration of the note we just "hit"
             const durationMs = getDurationMs(targetNote.duration, activeSong.bpm);
-            set({ songNextNoteTime: Date.now() + durationMs });
+            // Use existing songNextNoteTime as base to avoid drift
+            set({ songNextNoteTime: songNextNoteTime + durationMs });
           }
         }
       } else if (updatedNotes.length > 0) {
