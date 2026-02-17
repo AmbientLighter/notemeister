@@ -19,6 +19,7 @@ export default defineConfig(() => {
         includeAssets: ['icon.svg', 'samples/**/*.mp3'],
         workbox: {
           globPatterns: ['**/*.{js,css,html,svg,png,mp3}'],
+          maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         },
         manifest: {
           name: 'NoteMeister Sheet Music Trainer',
@@ -40,6 +41,17 @@ export default defineConfig(() => {
         },
       }),
     ],
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'osmd-vendor': ['opensheetmusicdisplay'],
+            'tone-vendor': ['tone'],
+            'vexflow-vendor': ['vexflow'],
+          },
+        },
+      },
+    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),
