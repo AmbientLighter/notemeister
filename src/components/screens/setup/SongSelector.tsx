@@ -23,14 +23,22 @@ const SongSelector: React.FC = () => {
     })),
   ];
 
-  const currentValue = settings.selectedSongId || 'random';
+  const currentValue = settings.scrolling.selectedSongId || 'random';
 
   return (
     <Dropdown
       label={t.selectSong}
       options={options}
       value={currentValue}
-      onChange={(val) => updateSettings({ selectedSongId: val === 'random' ? null : val })}
+      onChange={(val) => {
+        const newValue = val === 'random' ? null : val;
+        updateSettings({
+          scrolling: {
+            ...settings.scrolling,
+            selectedSongId: newValue,
+          },
+        });
+      }}
       className="flex-1"
     />
   );

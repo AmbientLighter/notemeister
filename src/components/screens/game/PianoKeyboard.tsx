@@ -35,7 +35,7 @@ const PianoKeyboard: React.FC<PianoKeyboardProps> = ({
     const usedOctaves = new Set<number>();
 
     if (settings.gameMode === 'standard') {
-      const currentNote = useGameStore.getState().settings.activeNotes; // Simplified: check what's enabled
+      const currentNote = settings.standard.activeNotes;
       currentNote.forEach((n) => {
         const octave = parseInt(n.replace(/^\D+/g, ''), 10);
         if (!isNaN(octave)) usedOctaves.add(octave);
@@ -45,7 +45,8 @@ const PianoKeyboard: React.FC<PianoKeyboardProps> = ({
       if (activeSong) {
         activeSong.notes.forEach((sn) => usedOctaves.add(sn.note.octave));
       } else {
-        settings.activeNotes.forEach((n) => {
+        // Fallback or default for scrolling if no song
+        settings.standard.activeNotes.forEach((n) => {
           const octave = parseInt(n.replace(/^\D+/g, ''), 10);
           if (!isNaN(octave)) usedOctaves.add(octave);
         });
@@ -63,7 +64,11 @@ const PianoKeyboard: React.FC<PianoKeyboardProps> = ({
       range.push(i);
     }
     return range;
-  }, [settings.gameMode, settings.activeNotes, useScrollingStore((state) => state.activeSong)]);
+  }, [
+    settings.gameMode,
+    settings.standard.activeNotes,
+    useScrollingStore((state) => state.activeSong),
+  ]);
 
   // Define keys based on calculated octaves
   const keys = useMemo(() => {
@@ -92,16 +97,18 @@ const PianoKeyboard: React.FC<PianoKeyboardProps> = ({
     <div className="w-full max-w-2xl mx-auto px-4 py-6 select-none">
       <div className="relative h-48 flex justify-center perspective-1000">
         {keys.map((key, index) => (
-          <button
+          <div
             key={`${key.name}${key.octave}-${index}`}
             onMouseDown={() => !key.isBlack && handleKeyPress(key.name, key.octave)}
             onPointerDown={() => !key.isBlack && handleKeyPress(key.name, key.octave)}
+            role={!key.isBlack ? 'button' : undefined}
+            tabIndex={!key.isBlack ? 0 : undefined}
             className={`
               relative transition-all duration-75 active:scale-95
               ${
                 key.isBlack
                   ? 'w-8 h-28 -mx-4 z-10 rounded-b-md shadow-lg border-x border-slate-700/50 hover:bg-slate-700 pointer-events-auto'
-                  : 'w-12 h-48 border border-slate-200 dark:border-slate-300 rounded-b-xl shadow-md hover:bg-slate-50 z-0'
+                  : 'w-12 h-48 border border-slate-200 dark:border-slate-300 rounded-b-xl shadow-md hover:bg-slate-50 z-0 cursor-pointer'
               }
               ${
                 activeNotes.some(
@@ -127,14 +134,16 @@ const PianoKeyboard: React.FC<PianoKeyboardProps> = ({
             )}
             {key.isBlack && (
               <button
+                type="button"
                 onPointerDown={(e) => {
                   e.stopPropagation();
                   handleKeyPress(key.name, key.octave);
                 }}
                 className="absolute inset-0 w-full h-full"
+                aria-label={`${key.name}${key.octave}`}
               />
             )}
-          </button>
+          </div>
         ))}
       </div>
     </div>

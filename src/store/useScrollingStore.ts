@@ -94,8 +94,8 @@ export const useScrollingStore = create<ScrollingState>((set, get) => ({
     }
 
     const { availableSongs } = get();
-    const selectedMeta = settings.selectedSongId
-      ? availableSongs.find((s) => s.id === settings.selectedSongId) || null
+    const selectedMeta = settings.scrolling.selectedSongId
+      ? availableSongs.find((s) => s.id === settings.scrolling.selectedSongId) || null
       : null;
 
     let loadedXML = '';
@@ -156,7 +156,7 @@ export const useScrollingStore = create<ScrollingState>((set, get) => ({
     } else {
       const lastNote =
         scrollingNotes.length > 0 ? scrollingNotes[scrollingNotes.length - 1].note : undefined;
-      noteToSpawn = generateRandomNote(settings.activeNotes, lastNote);
+      noteToSpawn = generateRandomNote(settings.standard.activeNotes, lastNote);
       if (noteToSpawn) {
         keys = [`${noteToSpawn.name.toLowerCase()}/${noteToSpawn.octave}`];
         duration = 'q';

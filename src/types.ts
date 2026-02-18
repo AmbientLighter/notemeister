@@ -32,15 +32,28 @@ export interface NoteStat {
   count: number;
 }
 
-export interface GameSettings {
+export interface GlobalSettings {
   clef: ClefType;
-  // activeNotes stores specific notes like "C4", "D5", etc.
-  activeNotes: string[];
-  tempo: Tempo;
   instrument: Instrument;
   inputMode: InputMode;
-  gameMode: GameMode;
+  language: Language;
+  theme: AppTheme;
+}
+
+export interface StandardSettings {
+  activeNotes: string[];
+  tempo: Tempo;
+}
+
+export interface ScrollingSettings {
   selectedSongId: string | null;
+  tempo: Tempo;
+}
+
+export interface GameSettings extends GlobalSettings {
+  gameMode: GameMode;
+  standard: StandardSettings;
+  scrolling: ScrollingSettings;
 }
 
 export interface GameStats {

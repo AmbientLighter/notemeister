@@ -29,7 +29,8 @@ export const useScrollingMode = () => {
 
       if (!storeState.isPaused) {
         const speedMap = { slow: 0.01, normal: 0.02, fast: 0.04 };
-        updateNotePositions(deltaTime, speedMap[settings.tempo]);
+        // Use scrolling tempo, default to normal
+        updateNotePositions(deltaTime, speedMap[settings.scrolling.tempo || 'normal']);
       }
 
       frameId = requestAnimationFrame(loop);
@@ -38,7 +39,7 @@ export const useScrollingMode = () => {
     frameId = requestAnimationFrame(loop);
 
     return () => cancelAnimationFrame(frameId);
-  }, [isScrolling, settings.tempo, updateNotePositions]);
+  }, [isScrolling, settings.scrolling.tempo, updateNotePositions]);
 
   return {
     scrollingNotes,

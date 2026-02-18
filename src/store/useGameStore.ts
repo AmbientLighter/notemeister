@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { NOTE_NAMES } from '@/constants';
-import type { ClefType, GameSettings, GameStats, Note, Screen } from '@/types';
+import type { ClefType, GameSettings, GameStats, Note, Screen, GlobalSettings } from '@/types';
 
 interface GameState {
   // Navigation
@@ -13,10 +13,6 @@ interface GameState {
   setScreen: (screen: Screen) => void;
   updateSettings: (settings: Partial<GameSettings>) => void;
   handleClefChange: (clef: ClefType) => void;
-  toggleOctaveGroup: (octave: number) => void;
-  toggleSingleNote: (key: string) => void;
-  getOctaveStatus: (octave: number) => 'full' | 'partial' | 'none';
-  initializeSettings: () => void;
 
   // Stats Management
   resetStats: () => void;
@@ -25,12 +21,19 @@ interface GameState {
 
 const DEFAULT_SETTINGS: GameSettings = {
   clef: 'treble',
-  activeNotes: NOTE_NAMES.map((name) => `${name}4`),
-  tempo: 'normal',
   instrument: 'piano',
   inputMode: 'keyboard',
   gameMode: 'standard',
-  selectedSongId: null,
+  language: 'en',
+  theme: 'system',
+  standard: {
+    activeNotes: NOTE_NAMES.map((name) => `${name}4`),
+    tempo: 'normal',
+  },
+  scrolling: {
+    selectedSongId: null,
+    tempo: 'normal',
+  },
 };
 
 export const useGameStore = create<GameState>()(
@@ -60,64 +63,8 @@ export const useGameStore = create<GameState>()(
 
       handleClefChange: (clef) => {
         set((state) => ({
-          settings: { ...state.settings, clef, activeNotes: [] },
+          settings: { ...state.settings, clef },
         }));
-        get().initializeSettings();
-      },
-
-      initializeSettings: () => {
-        const { settings } = get();
-        if (settings.activeNotes.length === 0) {
-          const defaultOctaves = settings.clef === 'treble' ? [4] : [3, 4];
-          const newNotes: string[] = [];
-          for (const oct of defaultOctaves) {
-            for (const name of NOTE_NAMES) {
-              newNotes.push(`${name}${oct}`);
-            }
-          }
-          get().updateSettings({ activeNotes: newNotes });
-        }
-      },
-
-      toggleOctaveGroup: (octave) => {
-        const { settings } = get();
-        const octaveNotes = NOTE_NAMES.map((name) => `${name}${octave}`);
-        const allSelected = octaveNotes.every((k) => settings.activeNotes.includes(k));
-
-        let newActive = [...settings.activeNotes];
-
-        if (allSelected) {
-          newActive = newActive.filter((k) => !octaveNotes.includes(k));
-        } else {
-          for (const k of octaveNotes) {
-            if (!newActive.includes(k)) newActive.push(k);
-          }
-        }
-
-        if (newActive.length > 0) {
-          get().updateSettings({ activeNotes: newActive });
-        }
-      },
-
-      toggleSingleNote: (key) => {
-        const { settings } = get();
-        const current = settings.activeNotes;
-        if (current.includes(key)) {
-          if (current.length > 1) {
-            get().updateSettings({ activeNotes: current.filter((k) => k !== key) });
-          }
-        } else {
-          get().updateSettings({ activeNotes: [...current, key] });
-        }
-      },
-
-      getOctaveStatus: (octave) => {
-        const { settings } = get();
-        const octaveNotes = NOTE_NAMES.map((name) => `${name}${octave}`);
-        const selectedCount = octaveNotes.filter((k) => settings.activeNotes.includes(k)).length;
-        if (selectedCount === 7) return 'full';
-        if (selectedCount > 0) return 'partial';
-        return 'none';
       },
 
       resetStats: () =>
@@ -145,23 +92,39 @@ export const useGameStore = create<GameState>()(
     }),
     {
       name: 'note-meister-storage',
-      version: 1,
-      // Custom merge to ensure settings object is merged deeply (preserving instrument if missing in old storage)
-      merge: (persistedState: any, currentState) => {
-        return {
-          ...currentState,
-          ...persistedState,
-          settings: {
-            ...currentState.settings,
-            ...(persistedState?.settings || {}),
-          },
-        };
-      },
+      version: 2,
       partialize: (state) => ({
         screen: state.screen,
-        settings: state.settings,
+        settings: {
+          clef: state.settings.clef,
+          instrument: state.settings.instrument,
+          inputMode: state.settings.inputMode,
+          language: state.settings.language,
+          theme: state.settings.theme,
+          gameMode: state.settings.gameMode,
+        },
         stats: state.stats,
       }),
+      merge: (persistedState, currentState) => {
+        const persisted = persistedState as GameState;
+        return {
+          ...currentState,
+          ...persisted,
+          settings: {
+            ...DEFAULT_SETTINGS,
+            ...persisted.settings,
+            standard: {
+              ...DEFAULT_SETTINGS.standard,
+              ...(persisted.settings?.standard || {}),
+            },
+            scrolling: {
+              ...DEFAULT_SETTINGS.scrolling,
+              ...(persisted.settings?.scrolling || {}),
+            },
+          },
+          stats: persisted.stats || currentState.stats,
+        };
+      },
     }
   )
 );

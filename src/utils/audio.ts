@@ -24,7 +24,7 @@ class AudioEngine {
   constructor() {}
 
   private async getSampler(instrument: Instrument): Promise<any> {
-    if (instrument === 'silence' || instrument === 'microphone') return undefined;
+    if (instrument === 'silence') return undefined;
 
     await this.init();
 

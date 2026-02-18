@@ -1,6 +1,5 @@
 import React from 'react';
 import { useGameStore } from '@/store/useGameStore';
-import { useSessionStore } from '@/store/useSessionStore';
 import { useScrollingStore } from '@/store/useScrollingStore';
 import FinishSessionButton from './FinishSessionButton';
 import { useTranslations } from '@/hooks/useTranslations';

@@ -4,10 +4,19 @@ import { useTranslations } from '@/hooks/useTranslations';
 import { Gauge, Zap } from 'lucide-react';
 import Dropdown from '@/components/common/Dropdown';
 
+import { useStandardStore } from '@/store/useStandardStore';
+import { useScrollingStore } from '@/store/useScrollingStore';
+
 const TempoSelector: React.FC = () => {
   const { t } = useTranslations();
-  const settings = useGameStore((state) => state.settings);
-  const updateSettings = useGameStore((state) => state.updateSettings);
+  const gameMode = useGameStore((state) => state.settings.gameMode);
+
+  const standardTempo = useStandardStore((state) => state.settings.tempo);
+  const updateStandardSettings = useStandardStore((state) => state.updateSettings);
+
+  // For scrolling mode, we can add tempo support later or keep it separate if needed.
+  // For now, let's assume standard mode isolation is the priority.
+  const isScrolling = gameMode === 'scrolling' || gameMode === 'demo';
 
   const tempos = [
     { id: 'slow', label: t.tempoSlow, icon: <Gauge className="w-5 h-5 text-emerald-500" /> },
@@ -19,8 +28,12 @@ const TempoSelector: React.FC = () => {
     <Dropdown
       label={t.selectTempo}
       options={tempos}
-      value={settings.tempo}
-      onChange={(val) => updateSettings({ tempo: val })}
+      value={isScrolling ? 'normal' : standardTempo}
+      onChange={(val) => {
+        if (!isScrolling) {
+          updateStandardSettings({ tempo: val });
+        }
+      }}
       className="mb-8"
     />
   );

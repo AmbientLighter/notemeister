@@ -2,12 +2,13 @@ import React from 'react';
 import { OCTAVE_RANGES } from '@/constants';
 import { useTranslations } from '@/hooks/useTranslations';
 import { useGameStore } from '@/store/useGameStore';
+import { useStandardStore } from '@/store/useStandardStore';
 
 const OctaveSelector: React.FC = () => {
   const { t } = useTranslations();
-  const settings = useGameStore((state) => state.settings);
-  const toggleOctaveGroup = useGameStore((state) => state.toggleOctaveGroup);
-  const getOctaveStatus = useGameStore((state) => state.getOctaveStatus);
+  const clef = useGameStore((state) => state.settings.clef);
+  const toggleOctaveGroup = useStandardStore((state) => state.toggleOctaveGroup);
+  const getOctaveStatus = useStandardStore((state) => state.getOctaveStatus);
 
   return (
     <div className="mb-8">
@@ -15,7 +16,7 @@ const OctaveSelector: React.FC = () => {
         {t.selectOctaves}
       </label>
       <div className="flex flex-wrap gap-3 justify-center">
-        {OCTAVE_RANGES[settings.clef].map((octave) => {
+        {OCTAVE_RANGES[clef].map((octave) => {
           const status = getOctaveStatus(octave);
           return (
             <button
